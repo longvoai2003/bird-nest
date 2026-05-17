@@ -1,0 +1,144 @@
+.hero {
+  background: radial-gradient(circle at top right, rgba(200, 146, 42, 0.2), transparent 34%), linear-gradient(135deg, #fffef9 0%, #fdf0d5 100%);
+  padding: 88px 0;
+}
+
+.heroGrid {
+  align-items: center;
+  display: grid;
+  gap: 44px;
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.hero h1 {
+  color: var(--color-primary-dark);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(3rem, 7vw, 5.8rem);
+  line-height: 0.98;
+  margin: 12px 0 20px;
+}
+
+.hero p:not(.eyebrow) {
+  color: var(--color-muted);
+  font-size: 1.12rem;
+  line-height: 1.75;
+  max-width: 620px;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.heroPanel {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(200, 146, 42, 0.42);
+  border-radius: 32px;
+  box-shadow: var(--shadow-soft);
+  min-height: 360px;
+  padding: 34px;
+}
+
+.heroPanel span {
+  background: var(--color-primary);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 900;
+  padding: 8px 13px;
+}
+
+.heroPanel h2 {
+  color: var(--color-primary-dark);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.05;
+  margin: 82px 0 14px;
+}
+
+.commitmentSection {
+  background: var(--color-surface);
+}
+
+.commitmentGrid {
+  align-items: center;
+  display: grid;
+  gap: 42px;
+  grid-template-columns: 0.95fr 1.05fr;
+}
+
+.commitmentGrid img {
+  aspect-ratio: 5 / 3;
+  border-radius: 28px;
+  box-shadow: var(--shadow-soft);
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.commitmentGrid h2 {
+  color: var(--color-primary-dark);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1.08;
+  margin: 10px 0 18px;
+}
+
+.commitmentGrid p:not(.eyebrow) {
+  color: var(--color-muted);
+  font-size: 1.04rem;
+  line-height: 1.75;
+  margin: 0 0 14px;
+}
+
+.serviceContainerWide {
+  max-width: min(1560px, calc(100% - 32px));
+}
+
+/* .serviceGrid { */
+/*   gap: 32px; */
+/*   margin-top: 32px; */
+/* } */
+
+
+.serviceGrid {
+  display: flex;
+  flex-direction: row;
+  /* flex-wrap: wrap */
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 32px;
+}
+
+.serviceCardSimple {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.serviceCardSimple h3 {
+  color: var(--color-primary-dark);
+  font-size: 1.45rem;
+  line-height: 1.25;
+  margin: 0;
+  padding: 0 0 18px;
+  text-align: center;
+}
+
+.serviceCardSimple img {
+  aspect-ratio: 16 / 9;
+  background: var(--color-accent-light);
+  display: block;
+  object-fit: cover;
+  max-width: 400px;
+  /* width: 960px; */
+}
+
+@media (max-width: 820px) {
+  .commitmentGrid,
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+}

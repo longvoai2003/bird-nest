@@ -1,0 +1,205 @@
+.productCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.productCard:hover {
+  border-color: rgba(200, 146, 42, 0.5);
+  box-shadow: 0 18px 42px rgba(94, 26, 24, 0.14);
+  transform: translateY(-3px);
+}
+
+.newsCard {
+  color: inherit;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+}
+
+.newsCardInner {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.newsCard:hover .newsCardInner {
+  border-color: rgba(200, 146, 42, 0.5);
+  box-shadow: 0 18px 42px rgba(94, 26, 24, 0.16);
+  transform: translateY(-3px);
+}
+
+.imageWrap {
+  background: linear-gradient(180deg, #fffaf0, #fdf0d5);
+  position: relative;
+}
+
+.imageWrap img {
+  aspect-ratio: 1 / 1;
+  background: var(--color-accent-light);
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.newsCardInner img {
+  aspect-ratio: 16 / 9;
+  background: var(--color-accent-light);
+  display: block;
+  object-fit: fill;
+  width: 100%;
+}
+
+.newsContainer {
+  width: min(1320px, calc(100% - 32px));
+}
+
+.newsGridCompact {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.imageWrap span,
+.newsCardBody span {
+  background: var(--color-accent-light);
+  border: 1px solid rgba(200, 146, 42, 0.45);
+  border-radius: 999px;
+  align-self: flex-start;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 7px 11px;
+}
+
+.imageWrap span {
+  left: 16px;
+  position: absolute;
+  top: 16px;
+}
+
+.productBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.newsCardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.productBody h3,
+.newsCardBody h3 {
+  color: var(--color-primary-dark);
+  font-size: 1.25rem;
+  margin: 0 0 10px;
+}
+
+.productBody h3 {
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+.newsCardBody h3 {
+  display: -webkit-box;
+  font-size: 1.08rem;
+  line-height: 1.36;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.productBody p,
+.newsCardBody p {
+  color: var(--color-muted);
+  line-height: 1.65;
+  margin: 0 0 18px;
+}
+
+.productBody p {
+  display: -webkit-box;
+  font-size: 0.95rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.newsCardBody p {
+  display: -webkit-box;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.productMeta {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.productMeta strong {
+  color: var(--color-primary);
+  font-size: 1.16rem;
+  white-space: nowrap;
+}
+
+.newsCardBody strong {
+  color: var(--color-primary);
+  font-weight: 900;
+  margin-top: auto;
+}
+
+.trustCard {
+  padding: 24px;
+}
+
+.trustCard h3 {
+  color: var(--color-primary-dark);
+  margin: 0 0 10px;
+}
+
+.trustCard p {
+  color: var(--color-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+@media (max-width: 1020px) {
+  .newsGridCompact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .productMeta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .newsGridCompact {
+    grid-template-columns: 1fr;
+  }
+}
