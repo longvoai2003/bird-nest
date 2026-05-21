@@ -1,16 +1,55 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Button } from "@/components/button";
-import { SectionHeading } from "@/components/section-heading";
-import { company } from "@/data/company";
+import { Button } from "@/components/ui/button";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { company } from "@/shared/config/company";
+
+type ApiError = {
+  error?: string;
+  issues?: Array<{ path: string; message: string }>;
+};
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitted(false);
+    setError(null);
+    setIsSubmitting(true);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: String(formData.get("fullName") ?? ""),
+          phone: String(formData.get("phone") ?? ""),
+          email: String(formData.get("email") ?? ""),
+          message: String(formData.get("message") ?? ""),
+        }),
+      });
+
+      const data = (await response.json()) as ApiError;
+
+      if (!response.ok) {
+        const issueText = data.issues?.map((issue) => issue.message).join(" ");
+        throw new Error(issueText || data.error || "Unable to submit contact request");
+      }
+
+      form.reset();
+      setSubmitted(true);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Unable to submit contact request");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -26,12 +65,13 @@ export default function ContactPage() {
           </div>
         </div>
         <form className="card formCard" onSubmit={submit}>
-          <label>Full name<input className="input" required name="name" /></label>
+          <label>Full name<input className="input" required name="fullName" /></label>
           <label>Phone number<input className="input" required name="phone" /></label>
           <label>Email address<input className="input" required type="email" name="email" /></label>
           <label>Message<textarea className="input" required name="message" rows={5} /></label>
-          <Button type="submit">Submit contact request</Button>
-          {submitted ? <p className="successText">Thank you. Your message has been submitted for the demo.</p> : null}
+          <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit contact request"}</Button>
+          {error ? <p className="errorText">{error}</p> : null}
+          {submitted ? <p className="successText">Thank you. Your message has been submitted.</p> : null}
         </form>
       </div>
     </section>

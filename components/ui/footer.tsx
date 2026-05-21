@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { company } from "@/data/company";
+import { company } from "@/shared/config/company";
 
 export function Footer() {
   return (

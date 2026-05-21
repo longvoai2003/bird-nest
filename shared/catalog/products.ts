@@ -10,6 +10,7 @@ export type Product = {
   category: "bird-nest";
   unit: string;
   availability: "in_stock" | "preorder" | "out_of_stock";
+  supportsPackaging?: boolean;
   sourceUrl: string;
   sortOrder: number;
 };
@@ -42,6 +43,7 @@ export const products: Product[] = [
     category: "bird-nest",
     unit: "set",
     availability: "in_stock",
+    supportsPackaging: true,
     sourceUrl: "https://www.yensaotiensa.com/to-yen-chung-nguyen-chat.html",
     sortOrder: 2,
   },
@@ -91,7 +93,3 @@ export const products: Product[] = [
     sortOrder: 5,
   },
 ];
-
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(value);
-}

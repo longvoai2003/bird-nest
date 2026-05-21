@@ -10,7 +10,14 @@
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-.productCard:hover {
+.productCardLink {
+  color: inherit;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+}
+
+.productCardLink:hover .productCard {
   border-color: rgba(200, 146, 42, 0.5);
   box-shadow: 0 18px 42px rgba(94, 26, 24, 0.14);
   transform: translateY(-3px);

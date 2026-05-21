@@ -1,18 +1,19 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { products, type Product } from "@/data/products";
+import { products, type Product } from "@/shared/catalog/products";
 
 export type CartLine = {
     productId: string;
     quantity: number;
+    packagingId?: string;
 };
 
 type CartContextValue = {
     lines: CartLine[];
-    addItem: (productId: string) => void;
-    updateQuantity: (productId: string, quantity: number) => void;
-    removeItem: (productId: string) => void;
+    addItem: (productId: string, packagingId?: string) => void;
+    updateQuantity: (productId: string, quantity: number, packagingId?: string) => void;
+    removeItem: (productId: string, packagingId?: string) => void;
     clearCart: () => void;
     itemCount: number;
     subtotal: number;
@@ -21,7 +22,6 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 const storageKey = "bird-nest-cart";
-
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const [lines, setLines] = useState<CartLine[]>([]);
@@ -53,25 +53,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const value: CartContextValue = {
         lines,
-        addItem: (productId) => {
+        addItem: (productId, packagingId) => {
             setLines((current) => {
-                const existing = current.find((line) => line.productId === productId);
+                const existing = current.find((line) => line.productId === productId && line.packagingId === packagingId);
                 if (existing) {
                     return current.map((line) =>
-                        line.productId === productId ? { ...line, quantity: line.quantity + 1 } : line,
+                        line.productId === productId && line.packagingId === packagingId
+                            ? { ...line, quantity: line.quantity + 1 }
+                            : line,
                     );
                 }
-                return [...current, { productId, quantity: 1 }];
+                return [...current, { productId, packagingId, quantity: 1 }];
             });
         },
-        updateQuantity: (productId, quantity) => {
+        updateQuantity: (productId, quantity, packagingId) => {
             setLines((current) =>
                 current
-                    .map((line) => (line.productId === productId ? { ...line, quantity: Math.max(0, quantity) } : line))
+                    .map((line) =>
+                        line.productId === productId && line.packagingId === packagingId
+                            ? { ...line, quantity: Math.max(0, quantity) }
+                            : line,
+                    )
                     .filter((line) => line.quantity > 0),
             );
         },
-        removeItem: (productId) => setLines((current) => current.filter((line) => line.productId !== productId)),
+        removeItem: (productId, packagingId) =>
+            setLines((current) => current.filter((line) => !(line.productId === productId && line.packagingId === packagingId))),
         clearCart: () => setLines([]),
         itemCount,
         subtotal,

@@ -1,11 +1,12 @@
-import { LinkButton } from "@/components/button";
+import { LinkButton } from "@/components/ui/button";
 
-export default function OrderSuccessPage() {
+export default function OrderSuccessPage({ searchParams }: { searchParams: { orderId?: string } }) {
   return (
     <section className="section">
       <div className="container card successPage">
         <p className="eyebrow">Order submitted</p>
         <h1>Thank you. Your demo order request has been submitted.</h1>
+        {searchParams.orderId ? <p>Your order reference is <strong>{searchParams.orderId}</strong>.</p> : null}
         <p>This MVP simulates order submission without online payment, accounts, or external chat integrations.</p>
         <div className="heroActions">
           <LinkButton href="/products">Continue browsing</LinkButton>

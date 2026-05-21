@@ -1,6 +1,6 @@
-import { NewsCard } from "@/components/news-card";
-import { SectionHeading } from "@/components/section-heading";
-import { news } from "@/data/news";
+import { news } from "@/server/content/news";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { NewsCard } from "@/features/news/components/news-card";
 
 export default function NewsPage() {
   return (

@@ -1,5 +1,5 @@
-import { SectionHeading } from "@/components/section-heading";
-import { company } from "@/data/company";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { company } from "@/shared/config/company";
 
 export default function AboutPage() {
   return (

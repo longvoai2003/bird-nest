@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { news } from "@/data/news";
+import { news } from "@/server/content/news";
 
 export function generateStaticParams() {
   return news.map((article) => ({ slug: article.slug }));

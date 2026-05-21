@@ -1,6 +1,6 @@
-import Link from "next/link";
 import Image from "next/image";
-import type { NewsArticle } from "@/data/news";
+import Link from "next/link";
+import type { NewsArticle } from "@/server/content/news";
 
 export function NewsCard({ article }: { article: NewsArticle }) {
   return (

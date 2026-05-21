@@ -1,11 +1,11 @@
 import Image from "next/image";
-import { LinkButton } from "@/components/button";
-import { NewsCard } from "@/components/news-card";
-import { ProductCard } from "@/components/product-card";
-import { SectionHeading } from "@/components/section-heading";
-import { company } from "@/data/company";
-import { news } from "@/data/news";
-import { products } from "@/data/products";
+import { news } from "@/server/content/news";
+import { LinkButton } from "@/components/ui/button";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { ProductCard } from "@/features/catalog/components/product-card";
+import { NewsCard } from "@/features/news/components/news-card";
+import { products } from "@/shared/catalog/products";
+import { company } from "@/shared/config/company";
 
 export default function HomePage() {
     return (
@@ -41,17 +41,8 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="section">
-                <div className="container">
-                    <SectionHeading eyebrow="Sản phẩm nổi bật" title="Yến sào cho sức khỏe và quà tặng" description="Các sản phẩm demo được thiết kế để thể hiện hành trình mua hàng đơn giản hơn website hiện tại." />
-                    <div className="grid3">
-                        {products.slice(0, 3).map((product) => <ProductCard key={product.id} product={product} />)}
-                    </div>
-                </div>
-            </section>
-
-      <section className="section sectionTint">
-        <div className="container serviceContainerWide">
+            <section className="section sectionTint">
+                <div className="container serviceContainerWide">
                     <SectionHeading
                         eyebrow="Sản phẩm"
                         title="Sản phẩm của chúng tôi"
@@ -70,6 +61,15 @@ export default function HomePage() {
                             <h3>Tư vấn và thi công nhà yến</h3>
                             <Image src="https://www.yensaotiensa.com/data/news/2009/thi-cong-lap-dat-nha-nuoi-yen-5-tang-tai-eakar-daklak-8.jpg" alt="Tư vấn và thi công nhà yến" width={500} height={300} />
                         </article>
+                    </div>
+                </div>
+            </section>
+
+            <section className="section">
+                <div className="container">
+                    <SectionHeading eyebrow="Sản phẩm nổi bật" title="Yến sào cho sức khỏe và quà tặng" description="Các sản phẩm demo được thiết kế để thể hiện hành trình mua hàng đơn giản hơn website hiện tại." />
+                    <div className="grid3">
+                        {products.slice(0, 3).map((product) => <ProductCard key={product.id} product={product} />)}
                     </div>
                 </div>
             </section>

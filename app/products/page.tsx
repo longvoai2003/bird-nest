@@ -1,6 +1,6 @@
-import { ProductCard } from "@/components/product-card";
-import { SectionHeading } from "@/components/section-heading";
-import { products } from "@/data/products";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { ProductCard } from "@/features/catalog/components/product-card";
+import { products } from "@/shared/catalog/products";
 
 export default function ProductsPage() {
   return (

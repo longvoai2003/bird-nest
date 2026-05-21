@@ -8,9 +8,9 @@ import "@/components/shared.css";
 import "@/components/layout.css";
 import "@/components/cards.css";
 import "@/components/cart.css";
-import { CartProvider } from "@/context/cart-context";
-import { Footer } from "@/components/footer";
-import { Header } from "@/components/header";
+import { Footer } from "@/components/ui/footer";
+import { Header } from "@/components/ui/header";
+import { CartProvider } from "@/features/cart/context/cart-context";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-body" });
 const playfair = Playfair_Display({ subsets: ["latin", "vietnamese"], variable: "--font-heading" });
