@@ -17,6 +17,7 @@ export type OrderItemInsert = {
 };
 
 export type OrderInsert = {
+    customerId?: string;
     customerName: string;
     customerPhone: string;
     customerEmail: string;
@@ -35,6 +36,7 @@ export async function insertOrder(input: OrderInsert) {
     return sql.begin(async (tx) => {
         const [order] = await tx<{ id: string }[]>`
       insert into orders (
+        customer_id,
         customer_name,
         customer_phone,
         customer_email,
@@ -44,6 +46,7 @@ export async function insertOrder(input: OrderInsert) {
         estimated_total_vnd,
         notes
       ) values (
+        ${input.customerId || null},
         ${input.customerName},
         ${input.customerPhone},
         ${input.customerEmail},

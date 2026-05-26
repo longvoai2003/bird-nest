@@ -54,6 +54,9 @@ export function Header() {
           <Link className="cartPill" href="/cart">
             Giỏ hàng <span>{itemCount}</span>
           </Link>
+          <Link className="authLink" href="/sign-in">
+            Đăng nhập
+          </Link>
           <button
             className="menuButton"
             onClick={() => setOpen((value) => !value)}
@@ -72,6 +75,9 @@ export function Header() {
           ))}
           <Link href="/cart" onClick={() => setOpen(false)}>
             Giỏ hàng ({itemCount})
+          </Link>
+          <Link href="/sign-in" onClick={() => setOpen(false)}>
+            Đăng nhập
           </Link>
         </nav>
       ) : null}

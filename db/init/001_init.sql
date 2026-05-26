@@ -1,7 +1,26 @@
 create extension if not exists pgcrypto;
 
+create table if not exists customers (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  phone text not null,
+  email text not null unique,
+  password_hash text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists customer_sessions (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid not null references customers(id) on delete cascade,
+  token text not null unique,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete set null,
   customer_name text not null,
   customer_phone text not null,
   customer_email text not null,
@@ -17,6 +36,7 @@ create table if not exists orders (
 );
 
 alter table orders add column if not exists packaging_status text not null default 'not_required';
+alter table orders add column if not exists customer_id uuid references customers(id) on delete set null;
 update orders
 set estimated_total_vnd = subtotal_vnd
 where estimated_total_vnd is distinct from subtotal_vnd;
@@ -57,6 +77,7 @@ alter table order_items add constraint order_items_check check (subtotal_vnd = (
 
 create table if not exists contact_requests (
   id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete set null,
   full_name text not null,
   phone text not null,
   email text not null,
@@ -65,9 +86,17 @@ create table if not exists contact_requests (
   created_at timestamptz not null default now()
 );
 
+alter table contact_requests add column if not exists customer_id uuid references customers(id) on delete set null;
+
+create unique index if not exists idx_customers_email on customers(email);
+create unique index if not exists idx_customer_sessions_token on customer_sessions(token);
+create index if not exists idx_customer_sessions_customer_id on customer_sessions(customer_id);
+create index if not exists idx_customer_sessions_expires_at on customer_sessions(expires_at);
 create index if not exists idx_orders_created_at on orders(created_at desc);
+create index if not exists idx_orders_customer_id on orders(customer_id);
 create index if not exists idx_orders_status_created_at on orders(status, created_at desc);
 create index if not exists idx_orders_customer_phone on orders(customer_phone);
 create index if not exists idx_order_items_order_id on order_items(order_id);
 create index if not exists idx_contact_requests_created_at on contact_requests(created_at desc);
 create index if not exists idx_contact_requests_status_created_at on contact_requests(status, created_at desc);
+create index if not exists idx_contact_requests_customer_id on contact_requests(customer_id);

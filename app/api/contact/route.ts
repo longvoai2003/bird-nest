@@ -1,3 +1,5 @@
+import { getSessionToken } from "@/app/api/auth/cookies";
+import { getCustomerForSession } from "@/server/services/auth";
 import { createContactRequest } from "@/server/services/contact";
 import { formatZodIssues } from "@/server/validation/common";
 import { createContactSchema } from "@/server/validation/contact";
@@ -21,7 +23,8 @@ export async function POST(request: Request) {
     }
 
     try {
-        const contact = await createContactRequest(parsed.data);
+        const customer = await getCustomerForSession(getSessionToken(request));
+        const contact = await createContactRequest(parsed.data, customer?.id);
         return Response.json(contact, { status: 201 });
     } catch (error) {
         console.error("Create contact request failed", error);

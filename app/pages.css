@@ -69,6 +69,37 @@
   margin: 0;
 }
 
+.errorText {
+  color: #b42318;
+  font-weight: 900;
+  margin: 0;
+}
+
+.authPage {
+  background: linear-gradient(180deg, rgba(253, 240, 213, 0.5), rgba(255, 254, 249, 0));
+}
+
+.authContainer {
+  max-width: 520px;
+}
+
+.authContainer h1 {
+  color: var(--color-primary-dark);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  margin: 0;
+}
+
+.authSwitch {
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.authSwitch a {
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
 .productsPage {
   background: linear-gradient(180deg, rgba(253, 240, 213, 0.45), rgba(255, 254, 249, 0) 360px);
 }

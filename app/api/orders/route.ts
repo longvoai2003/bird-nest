@@ -1,3 +1,5 @@
+import { getSessionToken } from "@/app/api/auth/cookies";
+import { getCustomerForSession } from "@/server/services/auth";
 import { createOrder, OrderInputError } from "@/server/services/orders";
 import { formatZodIssues } from "@/server/validation/common";
 import { createOrderSchema } from "@/server/validation/orders";
@@ -21,7 +23,8 @@ export async function POST(request: Request) {
     }
 
     try {
-        const order = await createOrder(parsed.data);
+        const customer = await getCustomerForSession(getSessionToken(request));
+        const order = await createOrder(parsed.data, customer?.id);
         return Response.json(order, { status: 201 });
     } catch (error) {
         if (error instanceof OrderInputError) {

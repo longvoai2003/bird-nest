@@ -4,7 +4,7 @@
 
 This document describes the recommended backend and local hosting design for the Yến Sào Tiên Sa MVP website.
 
-The goal is to add real backend services for order submission and contact requests while keeping the project simple enough to run locally on a laptop with Docker Compose.
+The goal is to add real backend services for order submission, contact requests, and lightweight customer accounts while keeping the project simple enough to run locally on a laptop with Docker Compose.
 
 The design supports:
 
@@ -13,6 +13,7 @@ The design supports:
 - PostgreSQL as the default local database.
 - Docker Compose for local development and laptop hosting.
 - A future path to Vercel deployment without rewriting the API layer.
+- Customer registration and sign-in for first-party customer data collection and future CRM readiness.
 
 ## 2. Recommended Strategy
 
@@ -32,14 +33,22 @@ This avoids running a separate Express/Nest backend for the MVP while still givi
 flowchart TD
     User[Customer Browser] --> Web[Next.js Frontend Pages]
     Web --> Cart[Client Cart State]
+    Web --> AuthApi[POST /api/auth/register and POST /api/auth/sign-in]
     Web --> OrdersApi[POST /api/orders]
     Web --> ContactApi[POST /api/contact]
+
+    AuthApi --> AuthValidation[Auth Validation]
+    AuthApi --> AuthService[Auth Service]
+    AuthService --> CustomerRepo[Customer Repository]
+    AuthService --> SessionRepo[Session Repository]
+    CustomerRepo --> Postgres[(PostgreSQL)]
+    SessionRepo --> Postgres
 
     OrdersApi --> OrderValidation[Order Validation]
     OrdersApi --> OrderService[Order Service]
     OrderService --> CatalogData[Trusted Product And Packaging Data]
     OrderService --> OrderRepo[Order Repository]
-    OrderRepo --> Postgres[(PostgreSQL)]
+    OrderRepo --> Postgres
 
     ContactApi --> ContactValidation[Contact Validation]
     ContactApi --> ContactService[Contact Service]
@@ -85,6 +94,10 @@ The initial backend should support:
 
 - Order request submission.
 - Contact request submission.
+- Customer registration.
+- Customer sign in and sign out.
+- Signed-in customer session lookup.
+- Optional association of orders and contact requests with a signed-in customer account.
 - Server-side input validation.
 - Server-side order total calculation.
 - PostgreSQL persistence.
@@ -93,8 +106,8 @@ The initial backend should support:
 The backend should not support yet:
 
 - Online payment.
-- Customer login/register.
 - Admin dashboard.
+- Full CRM dashboard, CRM automation, or staff customer management tools.
 - Inventory management.
 - Delivery tracking.
 - Product reviews.
@@ -103,6 +116,8 @@ The backend should not support yet:
 
 These exclusions match the MVP PRD scope.
 
+The customer account scope is intentionally lightweight. It exists to collect first-party customer profile data for future CRM integration, not to implement a complete CRM or customer service platform.
+
 ## 7. Proposed File Structure
 
 ```txt
@@ -110,6 +125,15 @@ app/
   about/
     page.tsx
   api/
+    auth/
+      me/
+        route.ts
+      register/
+        route.ts
+      sign-in/
+        route.ts
+      sign-out/
+        route.ts
     contact/
       route.ts
     orders/
@@ -127,6 +151,10 @@ app/
   order-success/
     page.tsx
   products/
+    page.tsx
+  register/
+    page.tsx
+  sign-in/
     page.tsx
   globals.css
   home.css
@@ -147,6 +175,10 @@ components/
   shared.css
 
 features/
+  auth/
+    components/
+      register-form.tsx
+      sign-in-form.tsx
   cart/
     context/
       cart-context.tsx
@@ -169,12 +201,16 @@ server/
   db/
     client.ts
   repositories/
+    customers.ts
+    sessions.ts
     contact.ts
     orders.ts
   services/
+    auth.ts
     contact.ts
     orders.ts
   validation/
+    auth.ts
     common.ts
     contact.ts
     orders.ts
@@ -217,10 +253,136 @@ Responsibilities:
 - Services apply business rules and calculate totals.
 - Repositories read and write PostgreSQL data.
 - `server/db/client.ts` owns the PostgreSQL connection client.
+- Auth helpers create, read, and clear secure HTTP-only customer session cookies.
 
 ## 9. API Design
 
-### 9.1 Create Order
+### 9.1 Register Customer
+
+Endpoint:
+
+```txt
+POST /api/auth/register
+```
+
+Request body:
+
+```ts
+{
+  fullName: string;
+  phone: string;
+  email: string;
+  password: string;
+  marketingConsent?: boolean;
+}
+```
+
+Success response:
+
+```ts
+{
+  customerId: string;
+  status: "registered";
+}
+```
+
+Error response:
+
+```ts
+{
+  error: string;
+  issues?: Array<{
+    path: string;
+    message: string;
+  }>;
+}
+```
+
+### 9.2 Sign In Customer
+
+Endpoint:
+
+```txt
+POST /api/auth/sign-in
+```
+
+Request body:
+
+```ts
+{
+  email: string;
+  password: string;
+}
+```
+
+Success response:
+
+```ts
+{
+  customerId: string;
+  fullName: string;
+  email: string;
+  status: "signed_in";
+}
+```
+
+Error response:
+
+```ts
+{
+  error: string;
+}
+```
+
+Invalid credentials should return a generic message such as `Invalid email or password`.
+
+### 9.3 Sign Out Customer
+
+Endpoint:
+
+```txt
+POST /api/auth/sign-out
+```
+
+Success response:
+
+```ts
+{
+  status: "signed_out";
+}
+```
+
+### 9.4 Current Customer
+
+Endpoint:
+
+```txt
+GET /api/auth/me
+```
+
+Success response when signed in:
+
+```ts
+{
+  customer: {
+    id: string;
+    fullName: string;
+    phone: string;
+    email: string;
+    marketingConsent: boolean;
+  };
+}
+```
+
+Success response when not signed in:
+
+```ts
+{
+  customer: null;
+}
+```
+
+### 9.5 Create Order
 
 Endpoint:
 
@@ -232,6 +394,7 @@ Request body:
 
 ```ts
 {
+  customerId?: string;
   customer: {
     fullName: string;
     phone: string;
@@ -246,6 +409,8 @@ Request body:
   notes?: string;
 }
 ```
+
+The browser should not send `customerId` directly. If the user is signed in, the API should read the customer identity from the server-side session cookie and associate the order with that customer account.
 
 Success response:
 
@@ -271,7 +436,7 @@ Error response:
 }
 ```
 
-### 9.2 Create Contact Request
+### 9.6 Create Contact Request
 
 Endpoint:
 
@@ -289,6 +454,8 @@ Request body:
   message: string;
 }
 ```
+
+If the user is signed in, the API should read the customer identity from the server-side session cookie and associate the contact request with that customer account.
 
 Success response:
 
@@ -318,6 +485,7 @@ sequenceDiagram
     participant Customer
     participant CheckoutPage
     participant OrdersApi as /api/orders
+    participant AuthSession as Customer Session
     participant OrderService
     participant Catalog as Product/Packaging Data
     participant Postgres
@@ -325,6 +493,7 @@ sequenceDiagram
     Customer->>CheckoutPage: Fill checkout form
     CheckoutPage->>OrdersApi: POST order payload
     OrdersApi->>OrdersApi: Validate request body
+    OrdersApi->>AuthSession: Read optional signed-in customer
     OrdersApi->>OrderService: createOrder(payload)
     OrderService->>Catalog: Load trusted products and packaging
     OrderService->>OrderService: Recalculate subtotal and total
@@ -339,21 +508,60 @@ sequenceDiagram
 
 Important rule:
 
-The backend must not trust prices, product names, packaging names, or totals from the browser. The browser should only send product IDs, quantities, customer details, packaging ID, and notes.
+The backend must not trust prices, product names, packaging names, totals, or customer account IDs from the browser. The browser should only send product IDs, quantities, customer details, packaging ID, and notes. Signed-in customer identity must come from the server-validated session.
 
-## 11. Contact Submission Flow
+## 11. Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant RegisterPage
+    participant SignInPage
+    participant AuthApi as /api/auth/*
+    participant AuthService
+    participant Postgres
+
+    Customer->>RegisterPage: Submit registration form
+    RegisterPage->>AuthApi: POST /api/auth/register
+    AuthApi->>AuthApi: Validate request body
+    AuthApi->>AuthService: createCustomerAccount(payload)
+    AuthService->>AuthService: Hash password
+    AuthService->>Postgres: Insert customer
+    Postgres-->>AuthService: Saved customer ID
+    AuthService-->>AuthApi: Registration confirmation
+    AuthApi-->>RegisterPage: Success response
+
+    Customer->>SignInPage: Submit email and password
+    SignInPage->>AuthApi: POST /api/auth/sign-in
+    AuthApi->>AuthService: verifyCredentials(payload)
+    AuthService->>Postgres: Load customer by email
+    AuthService->>AuthService: Verify password hash
+    AuthService->>Postgres: Create session and update last sign-in
+    AuthApi-->>SignInPage: Set HTTP-only session cookie
+```
+
+Important rules:
+
+- Passwords must never be stored as plain text.
+- Authentication should use secure HTTP-only cookies.
+- Session tokens stored in PostgreSQL should be hashed before persistence.
+- Registration and sign-in should not expose whether a password is incorrect separately from whether an email exists.
+
+## 12. Contact Submission Flow
 
 ```mermaid
 sequenceDiagram
     participant Customer
     participant ContactPage
     participant ContactApi as /api/contact
+    participant AuthSession as Customer Session
     participant ContactService
     participant Postgres
 
     Customer->>ContactPage: Fill contact form
     ContactPage->>ContactApi: POST contact payload
     ContactApi->>ContactApi: Validate request body
+    ContactApi->>AuthSession: Read optional signed-in customer
     ContactApi->>ContactService: createContactRequest(payload)
     ContactService->>Postgres: Insert contact request
     Postgres-->>ContactService: Saved contact ID
@@ -362,18 +570,43 @@ sequenceDiagram
     ContactPage-->>Customer: Show success message
 ```
 
-## 12. Database Design
+## 13. Database Design
 
 Use PostgreSQL as the default persistence layer.
 
-### 12.1 Entity Relationship Diagram
+### 13.1 Entity Relationship Diagram
 
 ```mermaid
 erDiagram
+    CUSTOMERS ||--o{ CUSTOMER_SESSIONS : has
+    CUSTOMERS ||--o{ ORDERS : places
+    CUSTOMERS ||--o{ CONTACT_REQUESTS : submits
     ORDERS ||--o{ ORDER_ITEMS : contains
+
+    CUSTOMERS {
+        uuid id PK
+        text full_name
+        text phone
+        text email
+        text password_hash
+        boolean marketing_consent
+        text status
+        timestamptz last_sign_in_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    CUSTOMER_SESSIONS {
+        uuid id PK
+        uuid customer_id FK
+        text session_token_hash
+        timestamptz expires_at
+        timestamptz created_at
+    }
 
     ORDERS {
         uuid id PK
+        uuid customer_id FK
         text customer_name
         text customer_phone
         text customer_email
@@ -404,6 +637,7 @@ erDiagram
 
     CONTACT_REQUESTS {
         uuid id PK
+        uuid customer_id FK
         text full_name
         text phone
         text email
@@ -413,13 +647,35 @@ erDiagram
     }
 ```
 
-### 12.2 Initial SQL Schema
+### 13.2 Initial SQL Schema
 
 ```sql
 create extension if not exists pgcrypto;
 
+create table if not exists customers (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  phone text not null,
+  email text not null unique,
+  password_hash text not null,
+  marketing_consent boolean not null default false,
+  status text not null default 'active',
+  last_sign_in_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists customer_sessions (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid not null references customers(id) on delete cascade,
+  session_token_hash text not null unique,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete set null,
   customer_name text not null,
   customer_phone text not null,
   customer_email text not null,
@@ -450,6 +706,7 @@ create table if not exists order_items (
 
 create table if not exists contact_requests (
   id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete set null,
   full_name text not null,
   phone text not null,
   email text not null,
@@ -457,9 +714,14 @@ create table if not exists contact_requests (
   status text not null default 'received',
   created_at timestamptz not null default now()
 );
+
+create index if not exists idx_customer_sessions_customer_id on customer_sessions(customer_id);
+create index if not exists idx_customer_sessions_expires_at on customer_sessions(expires_at);
+create index if not exists idx_orders_customer_id on orders(customer_id);
+create index if not exists idx_contact_requests_customer_id on contact_requests(customer_id);
 ```
 
-## 13. Catalog And Content Data Strategy
+## 14. Catalog And Content Data Strategy
 
 Product, packaging, and editorial content should stay in code for the MVP:
 
@@ -524,15 +786,28 @@ Recommended table responsibilities:
 
 For this MVP, I would not move news content into PostgreSQL yet. Catalog data is the stronger candidate because it is already server-trusted business data in the order flow.
 
-## 14. Validation Strategy
+## 15. Validation Strategy
 
 Use `zod` for request validation.
 
 Recommended dependencies:
 
 ```bash
-bun add zod postgres
+bun add zod postgres argon2
 ```
+
+Customer registration validation rules:
+
+- `fullName`: required, minimum 2 characters.
+- `phone`: required, basic phone format.
+- `email`: required, valid email, unique in `customers`.
+- `password`: required, minimum 8 characters.
+- `marketingConsent`: optional boolean.
+
+Customer sign-in validation rules:
+
+- `email`: required, valid email.
+- `password`: required.
 
 Order validation rules:
 
@@ -553,9 +828,9 @@ Contact validation rules:
 - `email`: required, valid email.
 - `message`: required, minimum 10 characters.
 
-## 15. Docker Design
+## 16. Docker Design
 
-### 15.1 Docker Compose Services
+### 16.1 Docker Compose Services
 
 ```yaml
 services:
@@ -565,6 +840,7 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgres://birdnest:birdnest@postgres:5432/birdnest
+      AUTH_SECRET: change-me-in-local-development
     depends_on:
       - postgres
     volumes:
@@ -594,7 +870,7 @@ volumes:
   postgres_data:
 ```
 
-### 15.2 Dockerfile
+### 16.2 Dockerfile
 
 ```dockerfile
 FROM oven/bun:1
@@ -611,7 +887,7 @@ EXPOSE 3000
 CMD ["bun", "run", "dev"]
 ```
 
-### 15.3 Environment Variables
+### 16.3 Environment Variables
 
 `.env.example` should include:
 
@@ -620,6 +896,7 @@ DATABASE_URL=postgres://birdnest:birdnest@localhost:5432/birdnest
 POSTGRES_USER=birdnest
 POSTGRES_PASSWORD=birdnest
 POSTGRES_DB=birdnest
+AUTH_SECRET=change-me-in-local-development
 ```
 
 Inside Docker Compose, the app should use the internal service hostname:
@@ -628,7 +905,7 @@ Inside Docker Compose, the app should use the internal service hostname:
 DATABASE_URL=postgres://birdnest:birdnest@postgres:5432/birdnest
 ```
 
-## 16. Local Development Workflow
+## 17. Local Development Workflow
 
 Run the full stack in Docker:
 
@@ -656,11 +933,35 @@ bun install
 bun run dev
 ```
 
-## 17. Frontend Integration Plan
+## 18. Frontend Integration Plan
+
+Add `app/register/page.tsx`:
+
+- Collect full name, phone, email, password, and optional marketing consent.
+- Send a `POST /api/auth/register` request.
+- Show loading state while submitting.
+- Show validation or server errors.
+- Redirect to sign in or automatically establish a session after successful registration, depending on final UX decision.
+
+Add `app/sign-in/page.tsx`:
+
+- Collect email and password.
+- Send a `POST /api/auth/sign-in` request.
+- Show loading state while submitting.
+- Show safe authentication errors.
+- Redirect back to checkout or the previous page after successful sign-in.
+
+Update shared header/navigation:
+
+- Show Register and Sign In when no customer is signed in.
+- Show signed-in customer state and Sign Out when a customer is signed in.
+- Keep Cart visible regardless of authentication state.
 
 Update `app/checkout/page.tsx`:
 
 - Collect checkout form values.
+- Read optional signed-in customer profile from `/api/auth/me`.
+- Prefill full name, phone number, and email address for signed-in customers.
 - Send a `POST /api/orders` request.
 - Show loading state while submitting.
 - Show validation or server errors.
@@ -674,16 +975,24 @@ Update `app/order-success/page.tsx`:
 
 Update `app/contact/page.tsx`:
 
+- Read optional signed-in customer profile from `/api/auth/me`.
+- Prefill full name, phone number, and email address for signed-in customers.
 - Send a `POST /api/contact` request.
 - Show loading state while submitting.
 - Show validation or server errors.
 - Show success message only after API success.
 
-## 18. Security Considerations
+## 19. Security Considerations
 
 MVP requirements:
 
 - Validate every API payload server-side.
+- Hash customer passwords with a strong password hashing algorithm such as `argon2`.
+- Store only password hashes, never plain-text passwords.
+- Use secure HTTP-only cookies for customer sessions.
+- Store hashed session tokens in PostgreSQL.
+- Expire customer sessions after a reasonable duration.
+- Associate orders and contact requests with a customer only from the validated server session.
 - Recalculate all prices and totals server-side.
 - Do not expose customer data publicly.
 - Do not collect card or payment data.
@@ -693,29 +1002,34 @@ MVP requirements:
 
 Future improvements:
 
-- Rate limiting for `/api/orders` and `/api/contact`.
+- Rate limiting for `/api/auth/*`, `/api/orders`, and `/api/contact`.
 - CAPTCHA for the contact form.
+- CAPTCHA or abuse protection for registration and sign-in.
+- Password reset flow.
+- Email verification.
 - Email notifications for new orders.
 - Admin authentication.
+- Staff CRM/customer management tools.
 - Order status management.
 - Audit logs for order changes.
 
-## 19. Future Vercel Compatibility
+## 20. Future Vercel Compatibility
 
 This design is primarily for Docker-based laptop hosting, but it remains compatible with a future Vercel deployment because the backend uses Next.js API routes.
 
 Future Vercel changes would likely include:
 
 - Replace local PostgreSQL with Neon, Supabase, or Vercel Postgres.
-- Set `DATABASE_URL` in Vercel environment variables.
+- Set `DATABASE_URL` and `AUTH_SECRET` in Vercel environment variables.
 - Keep `/api/orders` and `/api/contact` route handlers unchanged or minimally changed.
+- Keep `/api/auth/*` route handlers unchanged or minimally changed.
 - Keep product and packaging data in code until an admin system is needed.
 
-## 20. Implementation Phases
+## 21. Implementation Phases
 
 ```mermaid
 flowchart TD
-    P1[Phase 1\nTechnical Design Document] --> P2[Phase 2\nBackend API Foundation]
+    P1[Phase 1\nTechnical Design Document] --> P2[Phase 2\nAuth And Backend API Foundation]
     P2 --> P3[Phase 3\nPostgreSQL Schema And Docker]
     P3 --> P4[Phase 4\nFrontend API Integration]
     P4 --> P5[Phase 5\nVerification And Local Hosting]
@@ -726,11 +1040,18 @@ flowchart TD
 - Create this document.
 - Confirm Docker, PostgreSQL, and backend direction.
 
-### Phase 2: Backend API Foundation
+### Phase 2: Auth And Backend API Foundation
 
-- Add `zod` and `postgres` dependencies.
+- Add `zod`, `postgres`, and `argon2` dependencies.
 - Add `server/db/client.ts`.
 - Add validation schemas.
+- Add auth validation schemas.
+- Add customer and session repositories.
+- Add auth service for registration, sign-in, sign-out, and current customer lookup.
+- Add `/api/auth/register` route.
+- Add `/api/auth/sign-in` route.
+- Add `/api/auth/sign-out` route.
+- Add `/api/auth/me` route.
 - Add order and contact services.
 - Add order and contact repositories.
 - Add `/api/orders` route.
@@ -747,6 +1068,9 @@ flowchart TD
 ### Phase 4: Frontend API Integration
 
 - Update checkout page to submit real order requests.
+- Add register and sign-in pages.
+- Update site header to reflect signed-in/signed-out state.
+- Prefill checkout and contact forms for signed-in customers.
 - Update contact page to submit real contact requests.
 - Update success page to show order reference.
 - Move client feature code under `features/*` and generic UI under `components/ui/*`.
@@ -760,9 +1084,12 @@ flowchart TD
 - Run Docker Compose.
 - Submit a test order.
 - Submit a test contact request.
+- Register a test customer.
+- Sign in and sign out with the test customer.
+- Submit a test order while signed in.
 - Verify database rows through Adminer or `psql`.
 
-## 21. Verification Checklist
+## 22. Verification Checklist
 
 Technical verification:
 
@@ -775,16 +1102,23 @@ Technical verification:
 
 Functional verification:
 
+- User can register a customer account.
+- Backend rejects duplicate registration email addresses.
+- User can sign in with valid credentials.
+- Backend rejects invalid sign-in credentials with a safe generic message.
+- User can sign out.
 - User can add products to cart.
 - User can update cart quantities.
 - User can submit checkout with valid details.
 - Backend rejects invalid checkout payloads.
 - Order row is created in PostgreSQL.
 - Order item rows are created in PostgreSQL.
+- Signed-in order is linked to the customer account.
 - User can submit contact request.
 - Contact row is created in PostgreSQL.
+- Signed-in contact request is linked to the customer account.
 - Cart clears only after successful order submission.
 
-## 22. Recommended Next Step
+## 23. Recommended Next Step
 
-After this document is approved, implement Phase 2 and Phase 3 together. That will create the backend API routes, database schema, and Docker Compose environment needed to run the full MVP locally.
+After this document is approved, implement Phase 2 and Phase 3 together. That will create the auth routes, backend API routes, database schema, and Docker Compose environment needed to run the full MVP locally.

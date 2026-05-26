@@ -96,6 +96,11 @@
   text-align: center;
 }
 
+.authLink {
+  color: var(--color-primary-dark);
+  font-weight: 900;
+}
+
 .menuButton {
   background: var(--color-primary);
   border: 0;
