@@ -1,154 +1,103 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { packagingFamiliesWithVariants, type Packaging } from "@/shared/catalog/packaging";
-import { formatCurrency } from "@/shared/utils/currency";
+import { packagingOptions, type Packaging } from "@/shared/catalog/packaging";
+
+const colorOptions = [
+    { name: "Green", value: "Green", swatch: "#2f7d4f" },
+    { name: "Blue", value: "Blue", swatch: "#1f5f9f" },
+    { name: "Red", value: "Red", swatch: "#a51f24" },
+    { name: "Yellow", value: "Yellow", swatch: "#e7bd38" },
+] as const;
+
+const packagingTypeLabels: Record<string, string> = {
+    cylinder: "Hình trụ",
+    hexagon: "Hình lục giác",
+    suitcase: "Cái vali",
+};
 
 type PackagingSelectorProps = {
-  selectedPackagingId: string;
-  onSelect: (packagingId: string) => void;
+    selectedPackagingId: string;
+    onSelect: (packagingId: string) => void;
 };
 
 export function PackagingSelector({ selectedPackagingId, onSelect }: PackagingSelectorProps) {
-  const [activeFamilyId, setActiveFamilyId] = useState<string | null>(null);
+    const selectedPackaging = packagingOptions.find((variant) => variant.id === selectedPackagingId) ?? null;
+    const selectedColor = selectedPackaging?.primaryColor ?? "Green";
+    const packagesForColor = packagingOptions.filter((variant) => variant.primaryColor === selectedColor);
 
-  useEffect(() => {
-    if (!activeFamilyId) {
-      return;
+    function selectColor(color: string) {
+        const currentFamilyMatch = packagesForColor.find((variant) => variant.familyId === selectedPackaging?.familyId);
+        const nextSelection = packagingOptions.find(
+            (variant) => variant.primaryColor === color && variant.familyId === currentFamilyMatch?.familyId,
+        ) ?? packagingOptions.find((variant) => variant.primaryColor === color);
+
+        if (nextSelection) {
+            onSelect(nextSelection.id);
+        }
     }
 
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setActiveFamilyId(null);
-      }
-    }
-
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [activeFamilyId]);
-
-  const activeFamily = packagingFamiliesWithVariants.find((family) => family.id === activeFamilyId) ?? null;
-  const selectedPackaging = activeFamily?.variants.find((variant) => variant.id === selectedPackagingId)
-    ?? packagingFamiliesWithVariants.flatMap((family) => family.variants).find((variant) => variant.id === selectedPackagingId)
-    ?? null;
-
-  return (
-    <>
-      <div className="packagingFamilyGrid">
-        {packagingFamiliesWithVariants.map((family) => {
-          const familySelection = family.variants.find((variant) => variant.id === selectedPackagingId) ?? null;
-          const previewVariant = familySelection ?? family.variants[0];
-
-          return (
-            <button
-              className={`packagingFamilyCard card ${familySelection ? "selected" : ""}`}
-              key={family.id}
-              onClick={() => setActiveFamilyId(family.id)}
-              type="button"
-            >
-              <div className="packagingFamilyPreview">
-                <Image
-                  alt={family.name}
-                  className="packagingImage"
-                  height={360}
-                  sizes="(max-width: 700px) 100vw, (max-width: 940px) 50vw, 320px"
-                  src={previewVariant.image}
-                  width={360}
-                />
-              </div>
-              <div className="packagingFamilyCardBody">
-                <strong>{family.name}</strong>
-                <span>{family.description}</span>
-                <p className="packagingFamilyCardMeta">
-                  {family.variants.length} phiên bản
-                </p>
-                <em>
-                  {familySelection
-                    ? `Đã chọn: ${familySelection.name}`
-                    : "Chọn mẫu hộp"}
-                </em>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {selectedPackaging ? (
-        <div className="selectedPackagingNote card">
-          <strong>Mẫu hộp quà đã chọn</strong>
-          <span>{selectedPackaging.family.name} - {selectedPackaging.name}</span>
-          <p className="packagingColors">{selectedPackaging.primaryColor} phối {selectedPackaging.accentColor}</p>
-        </div>
-      ) : null}
-
-      {activeFamily ? (
-        <div className="packagingModalBackdrop" onClick={() => setActiveFamilyId(null)} role="presentation">
-          <div
-            aria-label={`${activeFamily.name} variants`}
-            aria-modal="true"
-            className="packagingModal card"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-          >
-            <div className="packagingModalHeader">
-              <div>
-                <h3>{activeFamily.name}</h3>
-                <p>{activeFamily.description}</p>
-              </div>
-              <button className="packagingModalClose" onClick={() => setActiveFamilyId(null)} type="button">
-                Đóng
-              </button>
+    return (
+        <>
+            <p className="packagingChoiceLabel">Màu sắc</p>
+            <div className="packagingColorGrid" aria-label="Chọn màu hộp quà">
+                {colorOptions.map((color) => (
+                    <button
+                        className={`packagingColorOption ${selectedColor === color.value ? "selected" : ""}`}
+                        aria-label={`Chọn màu ${color.name}`}
+                        key={color.value}
+                        onClick={() => selectColor(color.value)}
+                        title={color.name}
+                        type="button"
+                    >
+                        <span className="packagingColorSwatch" style={{ backgroundColor: color.swatch }} />
+                    </button>
+                ))}
             </div>
-            <div className="packagingGrid">
-              {activeFamily.variants.map((variant) => (
-                <PackagingVariantCard
-                  key={variant.id}
-                  isSelected={selectedPackagingId === variant.id}
-                  onSelect={(packagingId) => {
-                    onSelect(packagingId);
-                    setActiveFamilyId(null);
-                  }}
-                  variant={variant}
-                />
-              ))}
+
+            <p className="packagingChoiceLabel">Kiểu dáng</p>
+            <div className="packagingTypeGrid" aria-label="Chọn kiểu hộp quà">
+                {packagesForColor.map((variant) => (
+                    <PackagingVariantCard
+                        key={variant.id}
+                        isSelected={selectedPackagingId === variant.id}
+                        onSelect={onSelect}
+                        variant={variant}
+                    />
+                ))}
             </div>
-          </div>
-        </div>
-      ) : null}
-    </>
-  );
+
+            {selectedPackaging ? <p className="selectedPackagingText">Đã chọn: {selectedPackaging.name}</p> : null}
+        </>
+    );
 }
 
 type PackagingVariantCardProps = {
-  variant: Packaging;
-  isSelected: boolean;
-  onSelect: (packagingId: string) => void;
+    variant: Packaging;
+    isSelected: boolean;
+    onSelect: (packagingId: string) => void;
 };
 
 function PackagingVariantCard({ variant, isSelected, onSelect }: PackagingVariantCardProps) {
-  return (
-    <button
-      className={`packagingOption ${isSelected ? "selected" : ""}`}
-      onClick={() => onSelect(variant.id)}
-      type="button"
-    >
-      <div className="packagingImageFrame">
-        <Image
-          alt={`${variant.family.name} ${variant.name}`}
-          className="packagingImage"
-          height={360}
-          sizes="(max-width: 700px) 100vw, (max-width: 940px) 50vw, 280px"
-          src={variant.image}
-          width={360}
-        />
-      </div>
-      <div className="packagingMeta">
-        <strong>{variant.name}</strong>
-        <span>{variant.description}</span>
-        <p className="packagingColors">{variant.primaryColor} phối {variant.accentColor}</p>
-        <em>{formatCurrency(variant.price)}</em>
-      </div>
-    </button>
-  );
+    return (
+        <button
+            className={`packagingTypeOption ${isSelected ? "selected" : ""}`}
+            onClick={() => onSelect(variant.id)}
+            type="button"
+        >
+            <div className="packagingTypeImageFrame">
+                <Image
+                    alt={variant.name}
+                    className="packagingImage"
+                    height={180}
+                    sizes="(max-width: 700px) 33vw, 160px"
+                    src={variant.image}
+                    width={180}
+                />
+            </div>
+            <div className="packagingMeta">
+                <strong>{packagingTypeLabels[variant.familyId] ?? variant.family.name}</strong>
+            </div>
+        </button>
+    );
 }
