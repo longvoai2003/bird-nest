@@ -7,6 +7,7 @@ export type PackagingFamily = {
 export type PackagingVariant = {
   id: string;
   familyId: PackagingFamily["id"];
+  patternId: PackagingDecorationPattern["id"];
   name: string;
   description: string;
   primaryColor: string;
@@ -17,7 +18,17 @@ export type PackagingVariant = {
 
 export type Packaging = PackagingVariant & {
   family: PackagingFamily;
+  pattern: PackagingDecorationPattern;
 };
+
+export type PackagingDecorationPattern = {
+  id: string;
+  name: string;
+  description: string;
+  fileName: string;
+};
+
+const packagingPrice = 120000;
 
 export const packagingFamilies: PackagingFamily[] = [
   {
@@ -37,52 +48,53 @@ export const packagingFamilies: PackagingFamily[] = [
   },
 ];
 
-export const packagingVariants: PackagingVariant[] = [
+export const packagingDecorationPatterns: PackagingDecorationPattern[] = [
   {
-    id: "hexagon-teal-gold",
-    familyId: "hexagon",
-    name: "Teal and gold",
-    description: "Dark teal box with metallic gold accents for a refined modern look.",
-    primaryColor: "Teal",
-    accentColor: "Metallic Gold",
-    image: "/images/packaging/hexagon/teal-gold.png",
-    price: 90000,
+    id: "lotus",
+    name: "Hoa sen",
+    description: "Lotus decoration pattern for elegant gifting.",
+    fileName: "lotus.webp",
   },
   {
-    id: "suitcase-burgundy-gold",
-    familyId: "suitcase",
-    name: "Burgundy and gold",
-    description: "Deep burgundy box with metallic gold accents for a formal gift presentation.",
-    primaryColor: "Burgundy",
-    accentColor: "Metallic Gold",
-    image: "/images/packaging/suitcase/burgundy-gold.png",
-    price: 120000,
+    id: "swiftlet",
+    name: "Chim yến",
+    description: "Swiftlet decoration pattern inspired by bird nest heritage.",
+    fileName: "swiftlet.webp",
   },
   {
-    id: "hexagon-ochre-charcoal",
-    familyId: "hexagon",
-    name: "Ochre and charcoal",
-    description: "Warm ochre box with charcoal accents for an understated premium finish.",
-    primaryColor: "Ochre",
-    accentColor: "Charcoal",
-    image: "/images/packaging/hexagon/ochre-charcoal.png",
-    price: 105000,
-  },
-  {
-    id: "cylinder-royal-blue-gold",
-    familyId: "cylinder",
-    name: "Royal blue and gold",
-    description: "Deep royal blue cylindrical box with metallic gold accents and drawer storage.",
-    primaryColor: "Royal Blue",
-    accentColor: "Metallic Gold",
-    image: "/images/packaging/cylinder/royal-blue-gold.png",
-    price: 180000,
+    id: "apricot-blossom",
+    name: "Hoa mai",
+    description: "Apricot blossom decoration pattern for festive gifting.",
+    fileName: "apricot_blossom.webp",
   },
 ];
+
+const packagingColors = ["Blue", "Green", "Red", "Yellow"] as const;
+
+function toSlug(value: string) {
+  return value.toLowerCase().replace(/\s+/g, "-");
+}
+
+export const packagingVariants: PackagingVariant[] = packagingFamilies.flatMap((family) =>
+  packagingColors.flatMap((color) =>
+    packagingDecorationPatterns.map((pattern) => ({
+      id: `${family.id}-${toSlug(color)}-${pattern.id}`,
+      familyId: family.id,
+      patternId: pattern.id,
+      name: `${family.name.replace(" package", "")} ${color} ${pattern.name}`,
+      description: `${family.name.replace(" package", "")} ${color} gift packaging with ${pattern.name} decoration.`,
+      primaryColor: color,
+      accentColor: color,
+      image: `/images/packaging-new/${family.id}/${toSlug(color)}/${pattern.fileName}`,
+      price: packagingPrice,
+    })),
+  ),
+);
 
 export const packagingOptions: Packaging[] = packagingVariants.map((variant) => ({
   ...variant,
   family: packagingFamilies.find((family) => family.id === variant.familyId)!,
+  pattern: packagingDecorationPatterns.find((pattern) => pattern.id === variant.patternId)!,
 }));
 
 export const packagingFamiliesWithVariants = packagingFamilies.map((family) => ({

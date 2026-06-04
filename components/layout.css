@@ -96,6 +96,29 @@
   text-align: center;
 }
 
+.authLink {
+  color: var(--color-primary-dark);
+  font-weight: 900;
+}
+
+.authButton {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.customerGreeting {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .menuButton {
   background: var(--color-primary);
   border: 0;
@@ -115,6 +138,23 @@
 .mobileNav a {
   color: var(--color-primary-dark);
   display: block;
+  font-weight: 800;
+  padding: 12px 0;
+}
+
+.mobileCustomer {
+  color: var(--color-muted);
+  display: block;
+  font-weight: 800;
+  padding: 12px 0 4px;
+}
+
+.mobileSignOut {
+  background: transparent;
+  border: 0;
+  color: var(--color-primary-dark);
+  display: block;
+  font: inherit;
   font-weight: 800;
   padding: 12px 0;
 }

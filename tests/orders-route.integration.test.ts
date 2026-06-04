@@ -14,7 +14,7 @@ describeIntegration("POST /api/orders integration", () => {
     },
     items: [
       { productId: "yen-dao-cu-lao-cham", quantity: 1 },
-      { productId: "to-yen-chung-nguyen-chat", quantity: 2, packagingId: "cylinder-royal-blue-gold" },
+      { productId: "to-yen-chung-nguyen-chat", quantity: 2, packagingId: "cylinder-blue-lotus" },
     ],
     notes: "Please call before delivery.",
   };
@@ -49,8 +49,8 @@ describeIntegration("POST /api/orders integration", () => {
     expect(body.status).toBe("received");
     expect(typeof body.orderId).toBe("string");
     expect(body.orderId.length).toBeGreaterThan(0);
-    expect(body.subtotalVnd).toBe(4_460_000);
-    expect(body.estimatedTotalVnd).toBe(4_460_000);
+    expect(body.subtotalVnd).toBe(4_340_000);
+    expect(body.estimatedTotalVnd).toBe(4_340_000);
 
     const orders = await testSql<{
       id: string;
@@ -72,8 +72,8 @@ describeIntegration("POST /api/orders integration", () => {
       id: body.orderId,
       customer_name: validPayload.customer.fullName,
       packaging_status: "selected",
-      subtotal_vnd: 4_460_000,
-      estimated_total_vnd: 4_460_000,
+      subtotal_vnd: 4_340_000,
+      estimated_total_vnd: 4_340_000,
       notes: validPayload.notes,
       status: "received",
     });
@@ -84,25 +84,29 @@ describeIntegration("POST /api/orders integration", () => {
       packaging_family_name: string | null;
       packaging_variant_name: string | null;
       packaging_name: string | null;
+      packaging_color: string | null;
+      packaging_pattern_name: string | null;
       packaging_fee_vnd: number;
       quantity: number;
       subtotal_vnd: number;
     }[]>`
-      select product_id, packaging_id, packaging_family_name, packaging_variant_name, packaging_name, packaging_fee_vnd, quantity, subtotal_vnd
+      select product_id, packaging_id, packaging_family_name, packaging_variant_name, packaging_name, packaging_color, packaging_pattern_name, packaging_fee_vnd, quantity, subtotal_vnd
       from order_items
       order by product_id asc
     `;
 
-    expect(orderItems).toEqual([
+    expect(Array.from(orderItems)).toEqual([
       {
         product_id: "to-yen-chung-nguyen-chat",
-        packaging_id: "cylinder-royal-blue-gold",
+        packaging_id: "cylinder-blue-lotus",
         packaging_family_name: "Cylinder package",
-        packaging_variant_name: "Royal blue and gold",
-        packaging_name: "Cylinder package - Royal blue and gold",
-        packaging_fee_vnd: 180_000,
+        packaging_variant_name: "Cylinder Blue Hoa sen",
+        packaging_name: "Cylinder package - Blue - Hoa sen",
+        packaging_color: "Blue",
+        packaging_pattern_name: "Hoa sen",
+        packaging_fee_vnd: 120_000,
         quantity: 2,
-        subtotal_vnd: 1_260_000,
+        subtotal_vnd: 1_140_000,
       },
       {
         product_id: "yen-dao-cu-lao-cham",
@@ -110,6 +114,8 @@ describeIntegration("POST /api/orders integration", () => {
         packaging_family_name: null,
         packaging_variant_name: null,
         packaging_name: null,
+        packaging_color: null,
+        packaging_pattern_name: null,
         packaging_fee_vnd: 0,
         quantity: 1,
         subtotal_vnd: 3_200_000,

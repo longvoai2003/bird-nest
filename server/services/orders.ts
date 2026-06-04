@@ -16,7 +16,7 @@ type OrderRepository = (order: OrderInsert) => Promise<{ orderId: string }>;
 type PackagingStatus = OrderInsert["packagingStatus"];
 
 
-export function buildOrderInsert(input: CreateOrderInput): OrderInsert {
+export function buildOrderInsert(input: CreateOrderInput, customerId?: string): OrderInsert {
     const quantities = new Map<string, { productId: string; packagingId?: string; quantity: number }>();
 
     for (const item of input.items) {
@@ -45,6 +45,8 @@ export function buildOrderInsert(input: CreateOrderInput): OrderInsert {
         let packagingName: string | undefined;
         let packagingFamilyName: string | undefined;
         let packagingVariantName: string | undefined;
+        let packagingColor: string | undefined;
+        let packagingPatternName: string | undefined;
 
         if (packagingId) {
             if (!product.supportsPackaging) {
@@ -60,7 +62,9 @@ export function buildOrderInsert(input: CreateOrderInput): OrderInsert {
             packagingFeeVnd = packaging.price;
             packagingFamilyName = packaging.family.name;
             packagingVariantName = packaging.name;
-            packagingName = `${packaging.family.name} - ${packaging.name}`;
+            packagingColor = packaging.primaryColor;
+            packagingPatternName = packaging.pattern.name;
+            packagingName = `${packaging.family.name} - ${packaging.primaryColor} - ${packaging.pattern.name}`;
         }
 
         return {
@@ -74,6 +78,8 @@ export function buildOrderInsert(input: CreateOrderInput): OrderInsert {
             packagingFamilyName,
             packagingVariantName,
             packagingName,
+            packagingColor,
+            packagingPatternName,
             packagingFeeVnd,
             subtotalVnd: (product.price + packagingFeeVnd) * quantity,
         };
@@ -95,6 +101,7 @@ export function buildOrderInsert(input: CreateOrderInput): OrderInsert {
     }
 
     return {
+        customerId,
         customerName: input.customer.fullName,
         customerPhone: input.customer.phone,
         customerEmail: input.customer.email,
@@ -107,9 +114,10 @@ export function buildOrderInsert(input: CreateOrderInput): OrderInsert {
     };
 }
 
-export async function createOrder(input: CreateOrderInput, repository?: OrderRepository) {
-    const order = buildOrderInsert(input);
-    const persistOrder = repository ?? insertOrder;
+export async function createOrder(input: CreateOrderInput, customerIdOrRepository?: string | OrderRepository, repository?: OrderRepository) {
+    const customerId = typeof customerIdOrRepository === "string" ? customerIdOrRepository : undefined;
+    const order = buildOrderInsert(input, customerId);
+    const persistOrder = repository ?? (typeof customerIdOrRepository === "function" ? customerIdOrRepository : insertOrder);
 
     const { orderId } = await persistOrder(order);
 

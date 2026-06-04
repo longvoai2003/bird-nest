@@ -20,8 +20,10 @@ Build a demo MVP website where customers can:
 - Add products to an order cart.
 - Choose packaging services during checkout.
 - Submit an order request.
+- Register and sign in with a basic customer account.
+- Share reusable customer profile data that can support a future CRM.
 
-The MVP should show the business value of a clearer product-ordering experience without requiring a full production e-commerce system.
+The MVP should show the business value of a clearer product-ordering experience and early customer data collection without requiring a full production e-commerce or CRM system.
 
 ## 3. Problem Statement
 
@@ -41,6 +43,9 @@ The demo MVP should solve this by presenting a streamlined website experience fo
 - Order Cart
 - Checkout / Order Submission
 - Packaging Service Selection
+- Customer Registration
+- Customer Sign In
+- Basic Customer Profile Data Collection
 
 ### Explicitly Out of Scope for Demo MVP
 
@@ -49,8 +54,8 @@ The demo MVP should solve this by presenting a streamlined website experience fo
 - WhatsApp integration
 - Custom real-time chat system
 - Online payment
-- Customer login/register
 - Admin dashboard
+- Full CRM dashboard or CRM automation
 - Delivery tracking
 - Inventory management
 - Product reviews
@@ -101,6 +106,8 @@ The demo MVP should use simple navigation:
 - News
 - Contact
 - Cart
+- Register
+- Sign In
 
 This keeps the experience focused and avoids overwhelming users with too many categories.
 
@@ -129,7 +136,7 @@ Acceptance criteria:
 
 - Users can access the landing page from the main URL.
 - Users can understand that the website sells bird-nest products.
-- Users can navigate to About Us, Products, News, Contact, and Cart.
+- Users can navigate to About Us, Products, News, Contact, Cart, Register, and Sign In.
 - Users can start the ordering flow from the landing page.
 - The page is usable on desktop and mobile.
 
@@ -205,6 +212,7 @@ Acceptance criteria:
 - Users can submit a contact inquiry.
 - Required fields are validated.
 - Users receive a success message after submitting the form.
+- If the user is signed in, the contact request can be associated with the customer account.
 - No Zalo, Messenger, or external chat integration is required.
 
 ### 8.5 Product Listing Page
@@ -309,8 +317,80 @@ Acceptance criteria:
 - Users cannot submit checkout without required fields.
 - Users can review order details before submission.
 - Users can select packaging during checkout.
+- Signed-in users can reuse their saved name, phone number, and email address during checkout.
+- Guest checkout should remain available unless the business later decides to require accounts.
 - Users receive a confirmation message after submitting the order.
 - The MVP can simulate order submission without real payment integration.
+
+### 8.9 Customer Registration
+
+Customer registration allows customers to create a basic account so the business can collect first-party customer data for future CRM usage.
+
+Required registration fields:
+
+- Full name.
+- Phone number.
+- Email address.
+- Password.
+- Optional consent to receive future product updates or promotions.
+
+Acceptance criteria:
+
+- Users can access the registration page from the navigation menu.
+- Users can create an account with required fields.
+- Required fields are validated before submission.
+- Users cannot register with an email address that is already used by another account.
+- Passwords are never displayed or stored as plain text.
+- Users receive a clear success or error message after registration.
+- Registration creates a customer record that can later support CRM integration.
+
+### 8.10 Customer Sign In
+
+Customer sign in allows returning customers to access the website with their saved customer identity.
+
+Required sign-in fields:
+
+- Email address.
+- Password.
+
+Acceptance criteria:
+
+- Users can access the sign-in page from the navigation menu.
+- Users can sign in with valid account credentials.
+- Invalid credentials show a safe, generic error message.
+- Signed-in users can see that they are signed in.
+- Signed-in users can sign out.
+- Signed-in checkout can associate the submitted order with the customer account.
+
+### 8.11 Customer Data Collection For Future CRM
+
+The MVP should collect structured customer data in a way that can support a future CRM without building the CRM in this phase.
+
+Required collected customer data:
+
+- Customer ID.
+- Full name.
+- Phone number.
+- Email address.
+- Marketing or promotional consent status, if collected.
+- Account creation date.
+- Last sign-in date, if available.
+
+Recommended future CRM fields:
+
+- Order count.
+- Total order value.
+- Last order date.
+- Preferred product categories.
+- Contact request history.
+- Customer notes from staff.
+
+Acceptance criteria:
+
+- Customer profile data is stored in the backend database.
+- Orders can be linked to a signed-in customer account.
+- Contact requests can be linked to a signed-in customer account.
+- The MVP does not require a CRM dashboard, segmentation engine, or automated marketing workflows.
 
 ## 9. Non-Functional Requirements
 
@@ -318,7 +398,8 @@ Acceptance criteria:
 
 - The site should be easy to navigate.
 - The cart and checkout flow should be simple.
-- Users should not need an account to place an order.
+- Users should not need an account to place an order unless the business later chooses to require authentication.
+- Registration and sign-in should be optional and should not block the primary purchase journey in the demo MVP.
 - Primary actions should be visually clear.
 - Mobile usability should be prioritized.
 
@@ -341,6 +422,8 @@ The website should work on:
 
 - Form input should be validated.
 - Customer information should not be exposed publicly.
+- Account passwords should be stored only as secure password hashes.
+- Authentication should use secure HTTP-only cookies or an equivalent safe session mechanism.
 - HTTPS should be used in production.
 - No payment card information should be collected in the MVP.
 
@@ -395,6 +478,14 @@ As a customer, I want to choose gift packaging so that I can order bird-nest pro
 
 As a customer, I want to submit my delivery information so that the company can process my order request.
 
+### Customer Account
+
+As a new customer, I want to register an account so that the company can remember my contact information for future orders and service.
+
+As a returning customer, I want to sign in so that checkout can reuse my saved information.
+
+As the business, I want to collect structured customer profile data so that I can connect it to a CRM in the future.
+
 ## 11. MVP User Flow
 
 1. Customer visits the landing page.
@@ -404,12 +495,13 @@ As a customer, I want to submit my delivery information so that the company can 
 5. Customer adds one or more products to the cart.
 6. Customer opens the cart.
 7. Customer reviews products and quantities.
-8. Customer proceeds to checkout.
-9. Customer enters contact and delivery information.
-10. Customer selects a packaging option.
-11. Customer reviews the order summary.
-12. Customer submits the order request.
-13. Website displays an order confirmation message.
+8. Customer can optionally register or sign in.
+9. Customer proceeds to checkout.
+10. Customer enters contact and delivery information, or reuses saved profile information if signed in.
+11. Customer selects a packaging option.
+12. Customer reviews the order summary.
+13. Customer submits the order request.
+14. Website displays an order confirmation message.
 
 ## 12. Data Requirements
 
@@ -463,15 +555,35 @@ Recommended PostgreSQL `products` table fields for future backend integration:
 
 ### Customer Data
 
+- Customer ID.
 - Full name.
 - Phone number.
 - Email address.
+- Password hash, for registered accounts only.
 - Delivery address.
 - Order notes.
+- Marketing or promotional consent status.
+- Account status.
+- Last sign-in date.
+- Created date.
+
+Recommended PostgreSQL `customers` table fields:
+
+- `id` UUID primary key.
+- `full_name` text.
+- `phone` text.
+- `email` unique text.
+- `password_hash` text.
+- `marketing_consent` boolean.
+- `status` text, for example `active` or `disabled`.
+- `last_sign_in_at` timestamp nullable.
+- `created_at` timestamp.
+- `updated_at` timestamp.
 
 ### Order Data
 
 - Order ID.
+- Customer ID, nullable for guest checkout.
 - Customer information.
 - Product list.
 - Packaging option.
@@ -491,6 +603,9 @@ The demo MVP is successful if:
 - Users can choose packaging during checkout.
 - Users can submit a demo order request.
 - Users can submit a contact form.
+- Users can register a customer account.
+- Users can sign in and sign out.
+- Signed-in orders and contact requests can be associated with the customer account for future CRM usage.
 - The website works well on desktop and mobile.
 - The solution clearly demonstrates improvement over the original site's ordering experience.
 
@@ -505,7 +620,9 @@ After the demo MVP, the following features can be considered:
 - Product inventory management.
 - Order status tracking.
 - Email notifications.
-- Customer accounts.
+- Customer order history.
+- CRM integration or CRM export.
+- Customer segmentation and marketing consent management.
 - Product reviews.
 - Discount codes.
 - Multi-language support.
@@ -517,6 +634,8 @@ After the demo MVP, the following features can be considered:
 
 For the demo, the website should focus on the Must Have customer journey:
 
-`Landing Page -> Products -> Cart -> Checkout -> Packaging Selection -> Order Confirmation`
+`Landing Page -> Products -> Cart -> Optional Register/Sign In -> Checkout -> Packaging Selection -> Order Confirmation`
 
 Contact should be handled through a basic website form instead of Zalo or Messenger, because the demo provider does not own the company's official social business accounts.
+
+Customer registration and sign-in should be included as lightweight account features for data collection and future CRM readiness. They should not expand into a full CRM, admin dashboard, loyalty system, or marketing automation system during the MVP.

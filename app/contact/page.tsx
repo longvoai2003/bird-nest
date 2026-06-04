@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { company } from "@/shared/config/company";
@@ -10,10 +10,46 @@ type ApiError = {
   issues?: Array<{ path: string; message: string }>;
 };
 
+type AuthCustomer = {
+  id: string;
+  fullName: string;
+  phone: string;
+  email: string;
+};
+
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [customer, setCustomer] = useState({ fullName: "", phone: "", email: "" });
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadCustomer() {
+      const response = await fetch("/api/auth/me");
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = (await response.json()) as { customer: AuthCustomer | null };
+
+      if (!ignore && data.customer) {
+        setCustomer({
+          fullName: data.customer.fullName,
+          phone: data.customer.phone,
+          email: data.customer.email,
+        });
+      }
+    }
+
+    loadCustomer().catch(() => undefined);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,9 +101,9 @@ export default function ContactPage() {
           </div>
         </div>
         <form className="card formCard" onSubmit={submit}>
-          <label>Full name<input className="input" required name="fullName" /></label>
-          <label>Phone number<input className="input" required name="phone" /></label>
-          <label>Email address<input className="input" required type="email" name="email" /></label>
+          <label>Full name<input className="input" required name="fullName" value={customer.fullName} onChange={(event) => setCustomer((current) => ({ ...current, fullName: event.target.value }))} /></label>
+          <label>Phone number<input className="input" required name="phone" value={customer.phone} onChange={(event) => setCustomer((current) => ({ ...current, phone: event.target.value }))} /></label>
+          <label>Email address<input className="input" required type="email" name="email" value={customer.email} onChange={(event) => setCustomer((current) => ({ ...current, email: event.target.value }))} /></label>
           <label>Message<textarea className="input" required name="message" rows={5} /></label>
           <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit contact request"}</Button>
           {error ? <p className="errorText">{error}</p> : null}

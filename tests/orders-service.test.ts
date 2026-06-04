@@ -11,7 +11,7 @@ const validInput: CreateOrderInput = {
   },
   items: [
     { productId: "yen-dao-cu-lao-cham", quantity: 1 },
-    { productId: "to-yen-chung-nguyen-chat", quantity: 2, packagingId: "hexagon-teal-gold" },
+    { productId: "to-yen-chung-nguyen-chat", quantity: 2, packagingId: "hexagon-blue-lotus" },
   ],
   notes: "Please call before delivery.",
 };
@@ -20,15 +20,17 @@ describe("buildOrderInsert", () => {
   test("calculates totals from trusted catalog data", () => {
     const order = buildOrderInsert(validInput);
 
-    expect(order.subtotalVnd).toBe(4_280_000);
-    expect(order.estimatedTotalVnd).toBe(4_280_000);
+    expect(order.subtotalVnd).toBe(4_340_000);
+    expect(order.estimatedTotalVnd).toBe(4_340_000);
     expect(order.packagingStatus).toBe("selected");
     expect(order.items).toHaveLength(2);
     expect(order.items[0].sku).toBe("YSTS-YDCLC-001");
     expect(order.items[1].packagingFamilyName).toBe("Hexagon package");
-    expect(order.items[1].packagingVariantName).toBe("Teal and gold");
-    expect(order.items[1].packagingName).toBe("Hexagon package - Teal and gold");
-    expect(order.items[1].packagingFeeVnd).toBe(90_000);
+    expect(order.items[1].packagingVariantName).toBe("Hexagon Blue Hoa sen");
+    expect(order.items[1].packagingColor).toBe("Blue");
+    expect(order.items[1].packagingPatternName).toBe("Hoa sen");
+    expect(order.items[1].packagingName).toBe("Hexagon package - Blue - Hoa sen");
+    expect(order.items[1].packagingFeeVnd).toBe(120_000);
   });
 
   test("merges duplicate product lines", () => {
@@ -50,7 +52,7 @@ describe("buildOrderInsert", () => {
       ...validInput,
       items: [
         { productId: "to-yen-chung-nguyen-chat", quantity: 1 },
-        { productId: "to-yen-chung-nguyen-chat", quantity: 1, packagingId: "hexagon-teal-gold" },
+        { productId: "to-yen-chung-nguyen-chat", quantity: 1, packagingId: "hexagon-blue-lotus" },
       ],
     });
 
@@ -87,7 +89,7 @@ describe("buildOrderInsert", () => {
   test("rejects packaging on unsupported products", () => {
     expect(() => buildOrderInsert({
       ...validInput,
-      items: [{ productId: "yen-dao-cu-lao-cham", quantity: 1, packagingId: "hexagon-teal-gold" }],
+      items: [{ productId: "yen-dao-cu-lao-cham", quantity: 1, packagingId: "hexagon-blue-lotus" }],
     })).toThrow(OrderInputError);
   });
 });
@@ -95,7 +97,7 @@ describe("buildOrderInsert", () => {
 describe("createOrder", () => {
   test("persists the calculated order through the repository", async () => {
     const result = await createOrder(validInput, async (order) => {
-      expect(order.estimatedTotalVnd).toBe(4_280_000);
+      expect(order.estimatedTotalVnd).toBe(4_340_000);
       expect(order.packagingStatus).toBe("selected");
       return { orderId: "order-123" };
     });
@@ -103,8 +105,8 @@ describe("createOrder", () => {
     expect(result).toEqual({
       orderId: "order-123",
       status: "received",
-      subtotalVnd: 4_280_000,
-      estimatedTotalVnd: 4_280_000,
+      subtotalVnd: 4_340_000,
+      estimatedTotalVnd: 4_340_000,
     });
   });
 });
