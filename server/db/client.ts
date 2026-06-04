@@ -6,13 +6,14 @@ type GlobalWithSql = typeof globalThis & {
 
 function createSqlClient() {
     const databaseUrl = process.env.DATABASE_URL;
+    const maxConnections = Number(process.env.DATABASE_MAX_CONNECTIONS ?? "1");
 
     if (!databaseUrl) {
         throw new Error("DATABASE_URL is required");
     }
 
     return postgres(databaseUrl, {
-        max: 10,
+        max: Number.isFinite(maxConnections) && maxConnections > 0 ? maxConnections : 1,
     });
 }
 
