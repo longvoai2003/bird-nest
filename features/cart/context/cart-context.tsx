@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { products, type Product } from "@/shared/catalog/products";
+import { packagingOptions } from "@/shared/catalog/packaging";
 
 export type CartLine = {
     productId: string;
@@ -48,7 +49,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         [lines],
     );
 
-    const subtotal = detailedLines.reduce((total, line) => total + line.product.price * line.quantity, 0);
+    const subtotal = detailedLines.reduce((total, line) => {
+        const packaging = packagingOptions.find((item) => item.id === line.packagingId);
+        return total + (line.product.price + (packaging?.price ?? 0)) * line.quantity;
+    }, 0);
     const itemCount = lines.reduce((total, line) => total + line.quantity, 0);
 
     const value: CartContextValue = {

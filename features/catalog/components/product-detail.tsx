@@ -65,6 +65,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         <div><span>Giá hiện tại</span><strong>{formatCurrency(displayPrice)}</strong></div>
                     </div>
 
+                    {selectedPackaging ? (
+                        <div className="productPriceBreakdown card">
+                            <div><span>Giá sản phẩm</span><strong>{formatCurrency(product.price)}</strong></div>
+                            <div><span>Phí hộp quà</span><strong>+{formatCurrency(selectedPackaging.price)}</strong></div>
+                        </div>
+                    ) : product.supportsPackaging ? (
+                        <p className="productPackagingNote card">
+                            Có thể chọn hộp quà ở bên trên, phí hộp quà sẽ được cộng vào giá sản phẩm.
+                        </p>
+                    ) : null}
+
                     <div className="productPurchaseCard card">
                         <div className="quantityPicker">
                             <span>Số lượng</span>

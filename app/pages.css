@@ -200,6 +200,8 @@
 
 .productDetailMedia,
 .productDetailFacts,
+.productPriceBreakdown,
+.productPackagingNote,
 .productPurchaseCard {
   padding: 22px;
 }
@@ -239,12 +241,23 @@
   gap: 14px;
 }
 
+.productPriceBreakdown {
+  display: grid;
+  gap: 12px;
+}
+
 .productDetailFacts div {
   align-items: center;
   border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   padding-bottom: 12px;
+}
+
+.productPriceBreakdown div {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
 
 .productDetailFacts div:last-child {
@@ -256,9 +269,20 @@
   color: var(--color-muted);
 }
 
+.productPriceBreakdown span,
+.productPackagingNote {
+  color: var(--color-muted);
+}
+
 .productDetailFacts strong,
+.productPriceBreakdown strong,
 .productPackagingHeader h2 {
   color: var(--color-primary-dark);
+}
+
+.productPackagingNote {
+  line-height: 1.7;
+  margin: 0;
 }
 
 .productPackagingSection {

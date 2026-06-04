@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import type { RegisterInput, SignInInput } from "@/server/validation/auth";
 
 const defaultPublicCustomer = (customer: { id: string; fullName: string; phone: string; email: string }) => ({
@@ -20,8 +20,16 @@ const sessions = {
   insertSession: mock(async () => undefined),
 };
 
+const bcrypt = {
+  default: {
+    hash: mock(async () => "hashed-secret123"),
+    compare: mock(async () => true),
+  },
+};
+
 mock.module("@/server/repositories/customers", () => customers);
 mock.module("@/server/repositories/sessions", () => sessions);
+mock.module("bcryptjs", () => bcrypt);
 
 const signupInput: RegisterInput = {
   fullName: "Nguyen Van A",
@@ -48,17 +56,20 @@ beforeEach(() => {
   sessions.deleteSession.mockImplementation(async () => undefined);
   sessions.findCustomerBySessionToken.mockImplementation(async () => null);
   sessions.insertSession.mockImplementation(async () => undefined);
+  bcrypt.default.hash.mockClear();
+  bcrypt.default.compare.mockClear();
+  bcrypt.default.hash.mockImplementation(async () => "hashed-secret123");
+  bcrypt.default.compare.mockImplementation(async () => true);
 });
 
 describe("registerCustomer", () => {
   test("hashes the password and creates a customer session", async () => {
-    const hash = spyOn(Bun.password, "hash").mockResolvedValue("hashed-secret123");
     const { registerCustomer } = await import("@/server/services/auth");
 
     const result = await registerCustomer(signupInput);
 
     expect(customers.findCustomerByEmail).toHaveBeenCalledWith(signupInput.email);
-    expect(hash).toHaveBeenCalledWith(signupInput.password);
+    expect(bcrypt.default.hash).toHaveBeenCalledWith(signupInput.password, 12);
     expect(customers.insertCustomer).toHaveBeenCalledWith({
       fullName: signupInput.fullName,
       phone: signupInput.phone,
@@ -98,13 +109,12 @@ describe("signInCustomer", () => {
       email: loginInput.email,
       passwordHash: "hashed-secret123",
     });
-    const verify = spyOn(Bun.password, "verify").mockResolvedValue(true);
     const { signInCustomer } = await import("@/server/services/auth");
 
     const result = await signInCustomer(loginInput);
 
     expect(customers.findCustomerByEmail).toHaveBeenCalledWith(loginInput.email);
-    expect(verify).toHaveBeenCalledWith(loginInput.password, "hashed-secret123");
+    expect(bcrypt.default.compare).toHaveBeenCalledWith(loginInput.password, "hashed-secret123");
     expect(sessions.insertSession.mock.calls[0][0].customerId).toBe("customer-123");
 
     expect(result).toEqual({
@@ -131,7 +141,7 @@ describe("signInCustomer", () => {
       email: loginInput.email,
       passwordHash: "hashed-secret123",
     });
-    spyOn(Bun.password, "verify").mockResolvedValue(false);
+    bcrypt.default.compare.mockResolvedValue(false);
     const { AuthInputError, signInCustomer } = await import("@/server/services/auth");
 
     await expect(signInCustomer(loginInput)).rejects.toThrow(AuthInputError);

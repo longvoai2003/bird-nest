@@ -1,9 +1,11 @@
 import { randomBytes } from "node:crypto";
+import bcrypt from "bcryptjs";
 import { insertCustomer, findCustomerByEmail, toPublicCustomer } from "@/server/repositories/customers";
 import { deleteSession, findCustomerBySessionToken, insertSession } from "@/server/repositories/sessions";
 import type { RegisterInput, SignInInput } from "@/server/validation/auth";
 
 export const sessionMaxAgeSeconds = 60 * 60 * 24 * 30;
+const passwordSaltRounds = 12;
 
 export class AuthInputError extends Error {
     constructor(message: string) {
@@ -32,7 +34,7 @@ export async function registerCustomer(input: RegisterInput) {
         throw new AuthInputError("Email is already registered");
     }
 
-    const passwordHash = await Bun.password.hash(input.password);
+    const passwordHash = await bcrypt.hash(input.password, passwordSaltRounds);
     const customer = await insertCustomer({
         fullName: input.fullName,
         phone: input.phone,
@@ -47,7 +49,7 @@ export async function registerCustomer(input: RegisterInput) {
 export async function signInCustomer(input: SignInInput) {
     const customer = await findCustomerByEmail(input.email);
 
-    if (!customer || !(await Bun.password.verify(input.password, customer.passwordHash))) {
+    if (!customer || !(await bcrypt.compare(input.password, customer.passwordHash))) {
         throw new AuthInputError("Email or password is incorrect");
     }
 
