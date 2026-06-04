@@ -22,6 +22,7 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { detailedLines, subtotal, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [customer, setCustomer] = useState({ fullName: "", phone: "", email: "" });
 
@@ -87,15 +88,16 @@ export default function CheckoutPage() {
                 throw new Error(issueText || data.error || "Unable to submit order request");
             }
 
+            setCompletedOrderId(data.orderId);
             clearCart();
-            router.push(`/order-success?orderId=${encodeURIComponent(data.orderId)}`);
+            router.replace(`/order-success?orderId=${encodeURIComponent(data.orderId)}`);
         } catch (submitError) {
             setError(submitError instanceof Error ? submitError.message : "Unable to submit order request");
             setIsSubmitting(false);
         }
     }
 
-    if (detailedLines.length === 0) {
+    if (detailedLines.length === 0 && !isSubmitting && !completedOrderId) {
         return (
             <section className="section">
                 <div className="container emptyCart card">
@@ -110,7 +112,7 @@ export default function CheckoutPage() {
 
     return (
         <section className="section checkoutSection">
-            {isSubmitting ? (
+            {isSubmitting || completedOrderId ? (
                 <div className="checkoutProcessingOverlay" role="status" aria-live="polite" aria-label="Đang xử lý đơn hàng">
                     <div className="checkoutProcessingCard card">
                         <div className="checkoutProcessingIcon" aria-hidden="true">
@@ -119,8 +121,8 @@ export default function CheckoutPage() {
                             <span />
                         </div>
                         <p className="eyebrow">Đang xử lý</p>
-                        <h2>Đang lưu đơn hàng của bạn</h2>
-                        <p>Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng.</p>
+                        <h2>{completedOrderId ? "Đơn hàng đã được tạo" : "Đang lưu đơn hàng của bạn"}</h2>
+                        <p>{completedOrderId ? "Đang chuyển bạn đến trang xác nhận đơn hàng." : "Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng."}</p>
                     </div>
                 </div>
             ) : null}

@@ -1,4 +1,5 @@
 import { sessionCookie } from "@/app/api/auth/cookies";
+import { createAuthRequestId, getSafeErrorDetail } from "@/app/api/auth/errors";
 import { AuthInputError, registerCustomer } from "@/server/services/auth";
 import { registerSchema } from "@/server/validation/auth";
 import { formatZodIssues } from "@/server/validation/common";
@@ -26,7 +27,18 @@ export async function POST(request: Request) {
             return Response.json({ error: error.message }, { status: 400 });
         }
 
-        console.error("Register customer failed", error);
-        return Response.json({ error: "Unable to register" }, { status: 500 });
+        const requestId = createAuthRequestId("register");
+        const detail = getSafeErrorDetail(error);
+
+        console.error("Register customer failed", { requestId, detail, error });
+
+        return Response.json(
+            {
+                error: "Unable to register",
+                detail,
+                requestId,
+            },
+            { status: 500 },
+        );
     }
 }

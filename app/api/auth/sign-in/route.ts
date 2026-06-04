@@ -1,4 +1,5 @@
 import { sessionCookie } from "@/app/api/auth/cookies";
+import { createAuthRequestId, getSafeErrorDetail } from "@/app/api/auth/errors";
 import { AuthInputError, signInCustomer } from "@/server/services/auth";
 import { signInSchema } from "@/server/validation/auth";
 import { formatZodIssues } from "@/server/validation/common";
@@ -26,7 +27,18 @@ export async function POST(request: Request) {
             return Response.json({ error: error.message }, { status: 401 });
         }
 
-        console.error("Sign in customer failed", error);
-        return Response.json({ error: "Unable to sign in" }, { status: 500 });
+        const requestId = createAuthRequestId("signin");
+        const detail = getSafeErrorDetail(error);
+
+        console.error("Sign in customer failed", { requestId, detail, error });
+
+        return Response.json(
+            {
+                error: "Unable to sign in",
+                detail,
+                requestId,
+            },
+            { status: 500 },
+        );
     }
 }
