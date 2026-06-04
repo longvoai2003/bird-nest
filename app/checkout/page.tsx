@@ -91,7 +91,6 @@ export default function CheckoutPage() {
             router.push(`/order-success?orderId=${encodeURIComponent(data.orderId)}`);
         } catch (submitError) {
             setError(submitError instanceof Error ? submitError.message : "Unable to submit order request");
-        } finally {
             setIsSubmitting(false);
         }
     }
@@ -110,7 +109,21 @@ export default function CheckoutPage() {
     }
 
     return (
-        <section className="section">
+        <section className="section checkoutSection">
+            {isSubmitting ? (
+                <div className="checkoutProcessingOverlay" role="status" aria-live="polite" aria-label="Đang xử lý đơn hàng">
+                    <div className="checkoutProcessingCard card">
+                        <div className="checkoutProcessingIcon" aria-hidden="true">
+                            <span />
+                            <span />
+                            <span />
+                        </div>
+                        <p className="eyebrow">Đang xử lý</p>
+                        <h2>Đang lưu đơn hàng của bạn</h2>
+                        <p>Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng.</p>
+                    </div>
+                </div>
+            ) : null}
             <div className="container checkoutLayout">
                 <form className="checkoutForm" onSubmit={submit}>
                     <p className="eyebrow">Thanh toán</p>
@@ -124,7 +137,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {error ? <p className="errorText">{error}</p> : null}
-                    <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Đang gửi..." : "Gửi yêu cầu đặt hàng"}</Button>
+                    <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Đang xử lý đơn hàng..." : "Gửi yêu cầu đặt hàng"}</Button>
                 </form>
                 <OrderSummary lines={detailedLines} subtotal={subtotal} />
             </div>

@@ -14,6 +14,120 @@
   grid-template-columns: minmax(0, 1fr) 360px;
 }
 
+.checkoutSection {
+  position: relative;
+}
+
+.checkoutProcessingOverlay {
+  align-items: center;
+  background: rgba(47, 28, 20, 0.28);
+  backdrop-filter: blur(8px);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 24px;
+  position: fixed;
+  z-index: 80;
+}
+
+.checkoutProcessingCard {
+  animation: checkoutCardEnter 360ms ease-out;
+  box-shadow: 0 28px 90px rgba(47, 28, 20, 0.24);
+  max-width: 460px;
+  padding: 34px;
+  text-align: center;
+}
+
+.checkoutProcessingCard h2 {
+  color: var(--color-primary-dark);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.08;
+  margin: 10px 0;
+}
+
+.checkoutProcessingCard p:last-child {
+  color: var(--color-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.checkoutProcessingIcon {
+  align-items: center;
+  background: linear-gradient(135deg, #fff7e6, #fdf0d5);
+  border: 1px solid rgba(200, 146, 42, 0.35);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 8px;
+  height: 76px;
+  justify-content: center;
+  margin-bottom: 14px;
+  position: relative;
+  width: 76px;
+}
+
+.checkoutProcessingIcon::before {
+  animation: checkoutRing 1.8s ease-out infinite;
+  border: 1px solid rgba(200, 146, 42, 0.42);
+  border-radius: inherit;
+  content: "";
+  inset: -8px;
+  position: absolute;
+}
+
+.checkoutProcessingIcon span {
+  animation: checkoutPulse 900ms ease-in-out infinite;
+  background: var(--color-primary);
+  border-radius: 999px;
+  display: block;
+  height: 8px;
+  width: 8px;
+}
+
+.checkoutProcessingIcon span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.checkoutProcessingIcon span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+@keyframes checkoutCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes checkoutPulse {
+  0%, 80%, 100% {
+    opacity: 0.36;
+    transform: translateY(0) scale(0.86);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-7px) scale(1.08);
+  }
+}
+
+@keyframes checkoutRing {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.82);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
 .cartList {
   display: grid;
   gap: 16px;
