@@ -82,7 +82,7 @@ describe("POST /api/orders", () => {
           email: "customer@example.com",
           deliveryAddress: "123 Nguyen Van Linh, Da Nang",
         },
-        items: [{ productId: "yen-dao-cu-lao-cham", quantity: 1, packagingId: "hexagon-blue" }],
+        items: [{ productId: "yen-dao-cu-lao-cham", quantity: 1, packagingId: "hexagon-blue-lotus" }],
         notes: "Please call before delivery.",
       }),
     });

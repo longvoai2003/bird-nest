@@ -60,6 +60,8 @@ create table if not exists order_items (
   packaging_family_name text,
   packaging_variant_name text,
   packaging_name text,
+  packaging_color text,
+  packaging_pattern_name text,
   packaging_fee_vnd integer not null default 0 check (packaging_fee_vnd >= 0),
   quantity integer not null check (quantity between 1 and 99),
   subtotal_vnd integer not null check (subtotal_vnd >= 0),
@@ -71,6 +73,8 @@ alter table order_items add column if not exists packaging_id text;
 alter table order_items add column if not exists packaging_family_name text;
 alter table order_items add column if not exists packaging_variant_name text;
 alter table order_items add column if not exists packaging_name text;
+alter table order_items add column if not exists packaging_color text;
+alter table order_items add column if not exists packaging_pattern_name text;
 alter table order_items add column if not exists packaging_fee_vnd integer not null default 0;
 alter table order_items drop constraint if exists order_items_check;
 alter table order_items add constraint order_items_check check (subtotal_vnd = (unit_price_vnd + packaging_fee_vnd) * quantity);

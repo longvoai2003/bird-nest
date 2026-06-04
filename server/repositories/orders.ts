@@ -12,6 +12,8 @@ export type OrderItemInsert = {
     packagingFamilyName?: string;
     packagingVariantName?: string;
     packagingName?: string;
+    packagingColor?: string;
+    packagingPatternName?: string;
     packagingFeeVnd: number;
     subtotalVnd: number;
 };
@@ -72,6 +74,8 @@ export async function insertOrder(input: OrderInsert) {
           packaging_family_name,
           packaging_variant_name,
           packaging_name,
+          packaging_color,
+          packaging_pattern_name,
           packaging_fee_vnd,
           quantity,
           subtotal_vnd
@@ -86,6 +90,8 @@ export async function insertOrder(input: OrderInsert) {
           ${item.packagingFamilyName || null},
           ${item.packagingVariantName || null},
           ${item.packagingName || null},
+          ${item.packagingColor || null},
+          ${item.packagingPatternName || null},
           ${item.packagingFeeVnd},
           ${item.quantity},
           ${item.subtotalVnd}

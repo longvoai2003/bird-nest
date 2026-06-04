@@ -11,7 +11,7 @@ const validInput: CreateOrderInput = {
   },
   items: [
     { productId: "yen-dao-cu-lao-cham", quantity: 1 },
-    { productId: "to-yen-chung-nguyen-chat", quantity: 2, packagingId: "hexagon-blue" },
+    { productId: "to-yen-chung-nguyen-chat", quantity: 2, packagingId: "hexagon-blue-lotus" },
   ],
   notes: "Please call before delivery.",
 };
@@ -26,8 +26,10 @@ describe("buildOrderInsert", () => {
     expect(order.items).toHaveLength(2);
     expect(order.items[0].sku).toBe("YSTS-YDCLC-001");
     expect(order.items[1].packagingFamilyName).toBe("Hexagon package");
-    expect(order.items[1].packagingVariantName).toBe("Hexagon Blue");
-    expect(order.items[1].packagingName).toBe("Hexagon package - Hexagon Blue");
+    expect(order.items[1].packagingVariantName).toBe("Hexagon Blue Hoa sen");
+    expect(order.items[1].packagingColor).toBe("Blue");
+    expect(order.items[1].packagingPatternName).toBe("Hoa sen");
+    expect(order.items[1].packagingName).toBe("Hexagon package - Blue - Hoa sen");
     expect(order.items[1].packagingFeeVnd).toBe(120_000);
   });
 
@@ -50,7 +52,7 @@ describe("buildOrderInsert", () => {
       ...validInput,
       items: [
         { productId: "to-yen-chung-nguyen-chat", quantity: 1 },
-        { productId: "to-yen-chung-nguyen-chat", quantity: 1, packagingId: "hexagon-blue" },
+        { productId: "to-yen-chung-nguyen-chat", quantity: 1, packagingId: "hexagon-blue-lotus" },
       ],
     });
 
@@ -87,7 +89,7 @@ describe("buildOrderInsert", () => {
   test("rejects packaging on unsupported products", () => {
     expect(() => buildOrderInsert({
       ...validInput,
-      items: [{ productId: "yen-dao-cu-lao-cham", quantity: 1, packagingId: "hexagon-blue" }],
+      items: [{ productId: "yen-dao-cu-lao-cham", quantity: 1, packagingId: "hexagon-blue-lotus" }],
     })).toThrow(OrderInputError);
   });
 });

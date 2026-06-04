@@ -9,7 +9,7 @@ import { packagingOptions } from "@/shared/catalog/packaging";
 import { type Product } from "@/shared/catalog/products";
 import { formatCurrency } from "@/shared/utils/currency";
 
-const defaultPackagingId = "suitcase-green";
+const defaultPackagingId = "suitcase-green-lotus";
 
 type ProductDetailProps = {
     product: Product;

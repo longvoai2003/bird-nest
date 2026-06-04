@@ -7,6 +7,7 @@ export type PackagingFamily = {
 export type PackagingVariant = {
   id: string;
   familyId: PackagingFamily["id"];
+  patternId: PackagingDecorationPattern["id"];
   name: string;
   description: string;
   primaryColor: string;
@@ -17,6 +18,14 @@ export type PackagingVariant = {
 
 export type Packaging = PackagingVariant & {
   family: PackagingFamily;
+  pattern: PackagingDecorationPattern;
+};
+
+export type PackagingDecorationPattern = {
+  id: string;
+  name: string;
+  description: string;
+  fileName: string;
 };
 
 const packagingPrice = 120000;
@@ -39,132 +48,53 @@ export const packagingFamilies: PackagingFamily[] = [
   },
 ];
 
-export const packagingVariants: PackagingVariant[] = [
+export const packagingDecorationPatterns: PackagingDecorationPattern[] = [
   {
-    id: "cylinder-blue",
-    familyId: "cylinder",
-    name: "Cylinder Blue",
-    description: "Cylinder Blue gift packaging.",
-    primaryColor: "Blue",
-    accentColor: "Blue",
-    image: "/images/packaging-new/cylinder/cyclinder-blue.png",
-    price: packagingPrice,
+    id: "lotus",
+    name: "Hoa sen",
+    description: "Lotus decoration pattern for elegant gifting.",
+    fileName: "lotus.webp",
   },
   {
-    id: "cylinder-yellow",
-    familyId: "cylinder",
-    name: "Cylinder Yellow",
-    description: "Cylinder Yellow gift packaging.",
-    primaryColor: "Yellow",
-    accentColor: "Yellow",
-    image: "/images/packaging-new/cylinder/cylinder-yellow.png",
-    price: packagingPrice,
+    id: "swiftlet",
+    name: "Chim yến",
+    description: "Swiftlet decoration pattern inspired by bird nest heritage.",
+    fileName: "swiftlet.webp",
   },
   {
-    id: "cylinder-red",
-    familyId: "cylinder",
-    name: "Cylinder Red",
-    description: "Cylinder Red gift packaging.",
-    primaryColor: "Red",
-    accentColor: "Red",
-    image: "/images/packaging-new/cylinder/cylinder-red.png",
-    price: packagingPrice,
-  },
-  {
-    id: "cylinder-green",
-    familyId: "cylinder",
-    name: "Cylinder Green",
-    description: "Cylinder Green gift packaging.",
-    primaryColor: "Green",
-    accentColor: "Green",
-    image: "/images/packaging-new/cylinder/cylinder-green.png",
-    price: packagingPrice,
-  },
-  {
-    id: "hexagon-blue",
-    familyId: "hexagon",
-    name: "Hexagon Blue",
-    description: "Hexagon Blue gift packaging.",
-    primaryColor: "Blue",
-    accentColor: "Blue",
-    image: "/images/packaging-new/hexagon/hexagon-blue.png",
-    price: packagingPrice,
-  },
-  {
-    id: "hexagon-green",
-    familyId: "hexagon",
-    name: "Hexagon Green",
-    description: "Hexagon Green gift packaging.",
-    primaryColor: "Green",
-    accentColor: "Green",
-    image: "/images/packaging-new/hexagon/hexagon-green.png",
-    price: packagingPrice,
-  },
-  {
-    id: "hexagon-red",
-    familyId: "hexagon",
-    name: "Hexagon Red",
-    description: "Hexagon Red gift packaging.",
-    primaryColor: "Red",
-    accentColor: "Red",
-    image: "/images/packaging-new/hexagon/hexagon-red.png",
-    price: packagingPrice,
-  },
-  {
-    id: "hexagon-white",
-    familyId: "hexagon",
-    name: "Hexagon White",
-    description: "Hexagon White gift packaging.",
-    primaryColor: "White",
-    accentColor: "White",
-    image: "/images/packaging-new/hexagon/hexagon-white.png",
-    price: packagingPrice,
-  },
-  {
-    id: "suitcase-blue",
-    familyId: "suitcase",
-    name: "Suitcase Blue",
-    description: "Suitcase Blue gift packaging.",
-    primaryColor: "Blue",
-    accentColor: "Blue",
-    image: "/images/packaging-new/suitcase/suitcase-blue.png",
-    price: packagingPrice,
-  },
-  {
-    id: "suitcase-yellow",
-    familyId: "suitcase",
-    name: "Suitcase Yellow",
-    description: "Suitcase Yellow gift packaging.",
-    primaryColor: "Yellow",
-    accentColor: "Yellow",
-    image: "/images/packaging-new/suitcase/suitcase-yellow.png",
-    price: packagingPrice,
-  },
-  {
-    id: "suitcase-red",
-    familyId: "suitcase",
-    name: "Suitcase Red",
-    description: "Suitcase Red gift packaging.",
-    primaryColor: "Red",
-    accentColor: "Red",
-    image: "/images/packaging-new/suitcase/suitcase-red.png",
-    price: packagingPrice,
-  },
-  {
-    id: "suitcase-green",
-    familyId: "suitcase",
-    name: "Suitcase Green",
-    description: "Suitcase Green gift packaging.",
-    primaryColor: "Green",
-    accentColor: "Green",
-    image: "/images/packaging-new/suitcase/suitcase-green.png",
-    price: packagingPrice,
+    id: "apricot-blossom",
+    name: "Hoa mai",
+    description: "Apricot blossom decoration pattern for festive gifting.",
+    fileName: "apricot_blossom.webp",
   },
 ];
+
+const packagingColors = ["Blue", "Green", "Red", "Yellow"] as const;
+
+function toSlug(value: string) {
+  return value.toLowerCase().replace(/\s+/g, "-");
+}
+
+export const packagingVariants: PackagingVariant[] = packagingFamilies.flatMap((family) =>
+  packagingColors.flatMap((color) =>
+    packagingDecorationPatterns.map((pattern) => ({
+      id: `${family.id}-${toSlug(color)}-${pattern.id}`,
+      familyId: family.id,
+      patternId: pattern.id,
+      name: `${family.name.replace(" package", "")} ${color} ${pattern.name}`,
+      description: `${family.name.replace(" package", "")} ${color} gift packaging with ${pattern.name} decoration.`,
+      primaryColor: color,
+      accentColor: color,
+      image: `/images/packaging-new/${family.id}/${toSlug(color)}/${pattern.fileName}`,
+      price: packagingPrice,
+    })),
+  ),
+);
 
 export const packagingOptions: Packaging[] = packagingVariants.map((variant) => ({
   ...variant,
   family: packagingFamilies.find((family) => family.id === variant.familyId)!,
+  pattern: packagingDecorationPatterns.find((pattern) => pattern.id === variant.patternId)!,
 }));
 
 export const packagingFamiliesWithVariants = packagingFamilies.map((family) => ({

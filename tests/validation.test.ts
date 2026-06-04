@@ -36,7 +36,7 @@ describe("createOrderSchema", () => {
   test("accepts optional packaging per item", () => {
     expect(createOrderSchema.safeParse({
       ...validOrder,
-      items: [{ productId: "to-yen-chung-nguyen-chat", quantity: 1, packagingId: "hexagon-blue" }],
+      items: [{ productId: "to-yen-chung-nguyen-chat", quantity: 1, packagingId: "hexagon-blue-lotus" }],
     }).success).toBe(true);
   });
 });

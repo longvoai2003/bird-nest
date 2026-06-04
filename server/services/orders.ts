@@ -45,6 +45,8 @@ export function buildOrderInsert(input: CreateOrderInput, customerId?: string): 
         let packagingName: string | undefined;
         let packagingFamilyName: string | undefined;
         let packagingVariantName: string | undefined;
+        let packagingColor: string | undefined;
+        let packagingPatternName: string | undefined;
 
         if (packagingId) {
             if (!product.supportsPackaging) {
@@ -60,7 +62,9 @@ export function buildOrderInsert(input: CreateOrderInput, customerId?: string): 
             packagingFeeVnd = packaging.price;
             packagingFamilyName = packaging.family.name;
             packagingVariantName = packaging.name;
-            packagingName = `${packaging.family.name} - ${packaging.name}`;
+            packagingColor = packaging.primaryColor;
+            packagingPatternName = packaging.pattern.name;
+            packagingName = `${packaging.family.name} - ${packaging.primaryColor} - ${packaging.pattern.name}`;
         }
 
         return {
@@ -74,6 +78,8 @@ export function buildOrderInsert(input: CreateOrderInput, customerId?: string): 
             packagingFamilyName,
             packagingVariantName,
             packagingName,
+            packagingColor,
+            packagingPatternName,
             packagingFeeVnd,
             subtotalVnd: (product.price + packagingFeeVnd) * quantity,
         };

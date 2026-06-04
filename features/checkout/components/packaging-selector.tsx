@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { packagingOptions, type Packaging } from "@/shared/catalog/packaging";
+import { packagingDecorationPatterns, packagingOptions, type Packaging } from "@/shared/catalog/packaging";
 
 const colorOptions = [
     { name: "Green", value: "Green", swatch: "#2f7d4f" },
@@ -24,17 +24,27 @@ type PackagingSelectorProps = {
 export function PackagingSelector({ selectedPackagingId, onSelect }: PackagingSelectorProps) {
     const selectedPackaging = packagingOptions.find((variant) => variant.id === selectedPackagingId) ?? null;
     const selectedColor = selectedPackaging?.primaryColor ?? "Green";
-    const packagesForColor = packagingOptions.filter((variant) => variant.primaryColor === selectedColor);
+    const selectedFamilyId = selectedPackaging?.familyId ?? "suitcase";
+    const selectedPatternId = selectedPackaging?.patternId ?? "lotus";
+    const packagesForColor = packagingOptions.filter(
+        (variant) => variant.primaryColor === selectedColor && variant.patternId === selectedPatternId,
+    );
+    const selectedFamilyVariants = packagingOptions.filter(
+        (variant) => variant.primaryColor === selectedColor && variant.familyId === selectedFamilyId,
+    );
 
-    function selectColor(color: string) {
-        const currentFamilyMatch = packagesForColor.find((variant) => variant.familyId === selectedPackaging?.familyId);
+    function selectPackaging(nextColor: string, nextFamilyId: string, nextPatternId: string) {
         const nextSelection = packagingOptions.find(
-            (variant) => variant.primaryColor === color && variant.familyId === currentFamilyMatch?.familyId,
-        ) ?? packagingOptions.find((variant) => variant.primaryColor === color);
+            (variant) => variant.primaryColor === nextColor && variant.familyId === nextFamilyId && variant.patternId === nextPatternId,
+        ) ?? packagingOptions.find((variant) => variant.primaryColor === nextColor);
 
         if (nextSelection) {
             onSelect(nextSelection.id);
         }
+    }
+
+    function selectColor(color: string) {
+        selectPackaging(color, selectedFamilyId, selectedPatternId);
     }
 
     return (
@@ -59,6 +69,18 @@ export function PackagingSelector({ selectedPackagingId, onSelect }: PackagingSe
             <div className="packagingTypeGrid" aria-label="Chọn kiểu hộp quà">
                 {packagesForColor.map((variant) => (
                     <PackagingVariantCard
+                        key={variant.id}
+                        isSelected={selectedPackagingId === variant.id}
+                        onSelect={onSelect}
+                        variant={variant}
+                    />
+                ))}
+            </div>
+
+            <p className="packagingChoiceLabel">Họa tiết</p>
+            <div className="packagingTypeGrid" aria-label="Chọn họa tiết hộp quà">
+                {selectedFamilyVariants.map((variant) => (
+                    <PackagingPatternCard
                         key={variant.id}
                         isSelected={selectedPackagingId === variant.id}
                         onSelect={onSelect}
@@ -97,6 +119,30 @@ function PackagingVariantCard({ variant, isSelected, onSelect }: PackagingVarian
             </div>
             <div className="packagingMeta">
                 <strong>{packagingTypeLabels[variant.familyId] ?? variant.family.name}</strong>
+            </div>
+        </button>
+    );
+}
+
+function PackagingPatternCard({ variant, isSelected, onSelect }: PackagingVariantCardProps) {
+    return (
+        <button
+            className={`packagingTypeOption ${isSelected ? "selected" : ""}`}
+            onClick={() => onSelect(variant.id)}
+            type="button"
+        >
+            <div className="packagingTypeImageFrame">
+                <Image
+                    alt={variant.name}
+                    className="packagingImage"
+                    height={180}
+                    sizes="(max-width: 700px) 33vw, 160px"
+                    src={variant.image}
+                    width={180}
+                />
+            </div>
+            <div className="packagingMeta">
+                <strong>{packagingDecorationPatterns.find((pattern) => pattern.id === variant.patternId)?.name ?? variant.pattern.name}</strong>
             </div>
         </button>
     );

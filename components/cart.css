@@ -342,6 +342,21 @@
   }
 
   .packagingTypeGrid {
-    grid-template-columns: 1fr;
+    gap: 6px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .packagingTypeOption {
+    border-radius: 12px;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .packagingTypeImageFrame {
+    border-radius: 9px;
+  }
+
+  .packagingTypeOption strong {
+    font-size: 0.76rem;
   }
 }
