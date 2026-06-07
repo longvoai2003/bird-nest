@@ -1,8 +1,13 @@
 import { getSessionToken } from "@/app/api/auth/cookies";
+import { jsonWithCors, preflightResponse } from "@/app/api/cors";
 import { getCustomerForSession } from "@/server/services/auth";
 import { createContactRequest } from "@/server/services/contact";
 import { formatZodIssues } from "@/server/validation/common";
 import { createContactSchema } from "@/server/validation/contact";
+
+export function OPTIONS(request: Request) {
+    return preflightResponse(request);
+}
 
 export async function POST(request: Request) {
     let body: unknown;
@@ -10,13 +15,14 @@ export async function POST(request: Request) {
     try {
         body = await request.json();
     } catch {
-        return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+        return jsonWithCors(request, { error: "Invalid JSON payload" }, { status: 400 });
     }
 
     const parsed = createContactSchema.safeParse(body);
 
     if (!parsed.success) {
-        return Response.json(
+        return jsonWithCors(
+            request,
             { error: "Invalid contact payload", issues: formatZodIssues(parsed.error) },
             { status: 400 },
         );
@@ -25,9 +31,9 @@ export async function POST(request: Request) {
     try {
         const customer = await getCustomerForSession(getSessionToken(request));
         const contact = await createContactRequest(parsed.data, customer?.id);
-        return Response.json(contact, { status: 201 });
+        return jsonWithCors(request, contact, { status: 201 });
     } catch (error) {
         console.error("Create contact request failed", error);
-        return Response.json({ error: "Unable to submit contact request" }, { status: 500 });
+        return jsonWithCors(request, { error: "Unable to submit contact request" }, { status: 500 });
     }
 }
