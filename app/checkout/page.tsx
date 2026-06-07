@@ -56,6 +56,22 @@ export default function CheckoutPage() {
 
     async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        if (isSubmitting) {
+            return;
+        }
+
+        const orderItems = detailedLines.map((line) => ({
+            productId: line.productId,
+            quantity: line.quantity,
+            packagingId: line.packagingId,
+        }));
+
+        if (orderItems.length === 0) {
+            setError("Giỏ hàng của bạn đang trống.");
+            return;
+        }
+
         setIsSubmitting(true);
         setError(null);
 
@@ -72,16 +88,14 @@ export default function CheckoutPage() {
                         email: String(formData.get("email") ?? ""),
                         deliveryAddress: String(formData.get("deliveryAddress") ?? ""),
                     },
-                    items: detailedLines.map((line) => ({
-                        productId: line.productId,
-                        quantity: line.quantity,
-                        packagingId: line.packagingId,
-                    })),
+                    items: orderItems,
                     notes: String(formData.get("notes") ?? ""),
                 }),
             });
 
-            const data = (await response.json()) as (ApiError & { orderId?: string });
+            const data = await response
+                .json()
+                .catch(() => ({ error: "Unable to submit order request" })) as ApiError & { orderId?: string };
 
             if (!response.ok || !data.orderId) {
                 const issueText = data.issues?.map((issue) => issue.message).join(" ");
@@ -122,8 +136,8 @@ export default function CheckoutPage() {
                             <span />
                         </div>
                         <p className="eyebrow">Đang xử lý</p>
-                        <h2>{completedOrderId ? "Đơn hàng đã được tạo" : "Đang lưu đơn hàng của bạn"}</h2>
-                        <p>{completedOrderId ? "Đang chuyển bạn đến trang xác nhận đơn hàng." : "Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng."}</p>
+                        <h2>{isRedirectingToSuccess ? "Đơn hàng đã được tạo" : "Đang lưu đơn hàng của bạn"}</h2>
+                        <p>{isRedirectingToSuccess ? "Đang chuyển bạn đến trang xác nhận đơn hàng." : "Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng."}</p>
                     </div>
                 </div>
             ) : null}

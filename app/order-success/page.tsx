@@ -4,13 +4,14 @@ export default function OrderSuccessPage({ searchParams }: { searchParams: { ord
   return (
     <section className="section">
       <div className="container card successPage">
-        <p className="eyebrow">Order submitted</p>
-        <h1>Thank you. Your demo order request has been submitted.</h1>
-        {searchParams.orderId ? <p>Your order reference is <strong>{searchParams.orderId}</strong>.</p> : null}
-        <p>This MVP simulates order submission without online payment, accounts, or external chat integrations.</p>
+        <p className="eyebrow">Đặt hàng thành công</p>
+        <h1>Cảm ơn bạn. Yêu cầu đặt hàng đã được ghi nhận.</h1>
+        {searchParams.orderId ? <p>Mã đơn hàng của bạn là <strong>{searchParams.orderId}</strong>.</p> : null}
+        <p>Đội ngũ Bird Nest sẽ kiểm tra thông tin sản phẩm, địa chỉ giao hàng và liên hệ xác nhận trước khi chuẩn bị đơn.</p>
+        <p>Vui lòng giữ điện thoại sẵn sàng để chúng tôi có thể trao đổi thời gian giao hàng và các lưu ý đóng gói nếu cần.</p>
         <div className="heroActions">
-          <LinkButton href="/products">Continue browsing</LinkButton>
-          <LinkButton href="/" variant="secondary">Back to home</LinkButton>
+          <LinkButton href="/products">Tiếp tục xem sản phẩm</LinkButton>
+          <LinkButton href="/" variant="secondary">Về trang chủ</LinkButton>
         </div>
       </div>
     </section>
