@@ -22,6 +22,7 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { detailedLines, subtotal, clearCart, customerTier } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isRedirectingToSuccess, setIsRedirectingToSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [customer, setCustomer] = useState({ fullName: "", phone: "", email: "" });
 
@@ -87,15 +88,17 @@ export default function CheckoutPage() {
                 throw new Error(issueText || data.error || "Unable to submit order request");
             }
 
+            setIsRedirectingToSuccess(true);
             clearCart();
-            router.push(`/order-success?orderId=${encodeURIComponent(data.orderId)}`);
+            router.replace(`/order-success?orderId=${encodeURIComponent(data.orderId)}`);
         } catch (submitError) {
             setError(submitError instanceof Error ? submitError.message : "Unable to submit order request");
             setIsSubmitting(false);
+            setIsRedirectingToSuccess(false);
         }
     }
 
-    if (detailedLines.length === 0) {
+    if (detailedLines.length === 0 && !isSubmitting && !isRedirectingToSuccess) {
         return (
             <section className="section">
                 <div className="container emptyCart card">
@@ -110,7 +113,7 @@ export default function CheckoutPage() {
 
     return (
         <section className="section checkoutSection">
-            {isSubmitting ? (
+            {isSubmitting || isRedirectingToSuccess ? (
                 <div className="checkoutProcessingOverlay" role="status" aria-live="polite" aria-label="Đang xử lý đơn hàng">
                     <div className="checkoutProcessingCard card">
                         <div className="checkoutProcessingIcon" aria-hidden="true">
