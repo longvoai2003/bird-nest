@@ -8,6 +8,11 @@ describe("createContactRequest", () => {
         fullName: "Nguyen Van A",
         phone: "0901234567",
         email: "customer@example.com",
+        requestType: "Tư vấn thiết kế hộp quà",
+        relatedProduct: "Tổ yến chưng nguyên chất",
+        appointmentDate: "2026-06-10",
+        appointmentTime: "14:00-16:00",
+        consultationMethod: "Gọi điện",
         message: "I would like to ask about premium bird nest products.",
     }
     test("passes the validated contact payload to the repository", async () => {

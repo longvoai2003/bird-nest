@@ -53,12 +53,24 @@ describe("createContactSchema", () => {
     expect(createContactSchema.safeParse(validContact).success).toBe(true);
   });
 
+  test("accepts contact appointment details", () => {
+    expect(createContactSchema.safeParse({
+      ...validContact,
+      requestType: "Tư vấn thiết kế hộp quà",
+      relatedProduct: "Tổ yến chưng nguyên chất",
+      appointmentDate: "2026-06-10",
+      appointmentTime: "14:00-16:00",
+      consultationMethod: "Gọi điện",
+    }).success).toBe(true);
+  });
+
   test("rejects invalid contact fields", () => {
     const result = createContactSchema.safeParse({
       fullName: "A",
       phone: "invalid",
       email: "bad",
       message: "too short",
+      appointmentDate: "10/06/2026",
     });
 
     expect(result.success).toBe(false);

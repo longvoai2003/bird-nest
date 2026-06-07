@@ -91,6 +91,11 @@ create table if not exists contact_requests (
 );
 
 alter table contact_requests add column if not exists customer_id uuid references customers(id) on delete set null;
+alter table contact_requests add column if not exists request_type text;
+alter table contact_requests add column if not exists related_product text;
+alter table contact_requests add column if not exists appointment_date date;
+alter table contact_requests add column if not exists appointment_time text;
+alter table contact_requests add column if not exists consultation_method text;
 
 create unique index if not exists idx_customers_email on customers(email);
 create unique index if not exists idx_customer_sessions_token on customer_sessions(token);
@@ -104,3 +109,5 @@ create index if not exists idx_order_items_order_id on order_items(order_id);
 create index if not exists idx_contact_requests_created_at on contact_requests(created_at desc);
 create index if not exists idx_contact_requests_status_created_at on contact_requests(status, created_at desc);
 create index if not exists idx_contact_requests_customer_id on contact_requests(customer_id);
+create index if not exists idx_contact_requests_appointment_date on contact_requests(appointment_date);
+create index if not exists idx_contact_requests_request_type_created_at on contact_requests(request_type, created_at desc);

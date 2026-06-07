@@ -9,6 +9,11 @@ describeIntegration("POST /api/contact integration", () => {
     fullName: "Nguyen Van A",
     phone: "0901234567",
     email: "customer@example.com",
+    requestType: "Tư vấn thiết kế hộp quà",
+    relatedProduct: "Tổ yến chưng nguyên chất",
+    appointmentDate: "2026-06-10",
+    appointmentTime: "14:00-16:00",
+    consultationMethod: "Gọi điện",
     message: "I would like to ask about premium bird nest products.",
   };
 
@@ -49,9 +54,14 @@ describeIntegration("POST /api/contact integration", () => {
       phone: string;
       email: string;
       message: string;
+      request_type: string;
+      related_product: string;
+      appointment_date: string;
+      appointment_time: string;
+      consultation_method: string;
       status: string;
     }[]>`
-      select id, full_name, phone, email, message, status
+      select id, full_name, phone, email, message, request_type, related_product, appointment_date::text, appointment_time, consultation_method, status
       from contact_requests
       order by created_at desc
       limit 1
@@ -64,6 +74,11 @@ describeIntegration("POST /api/contact integration", () => {
       phone: validPayload.phone,
       email: validPayload.email,
       message: validPayload.message,
+      request_type: validPayload.requestType,
+      related_product: validPayload.relatedProduct,
+      appointment_date: validPayload.appointmentDate,
+      appointment_time: validPayload.appointmentTime,
+      consultation_method: validPayload.consultationMethod,
       status: "received",
     });
   });
