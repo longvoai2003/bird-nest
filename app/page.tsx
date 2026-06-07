@@ -22,9 +22,19 @@ export default function HomePage() {
                         </div>
                     </div>
                     <div className="heroPanel">
-                        <span>OCOP 4 sao</span>
-                        <h2>Trải nghiệm đặt yến sào rõ ràng hơn</h2>
-                        <p>Luồng MVP tập trung vào sản phẩm, giỏ hàng, đóng gói và gửi yêu cầu đặt hàng.</p>
+                        <div className="heroVideoFrame">
+                            <iframe
+                                src="https://www.youtube.com/embed/A1xlHUGhLlQ"
+                                title="Giới thiệu Yến Sào Tiên Sa"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                            />
+                        </div>
+                        <div className="heroVideoContent">
+                            <span>OCOP 4 sao</span>
+                            <h2>Xem câu chuyện Yến Sào Tiên Sa</h2>
+                            <p>Video giới thiệu giúp khách hàng hiểu rõ hơn về thương hiệu, sản phẩm và cam kết chất lượng trước khi đặt hàng.</p>
+                        </div>
                     </div>
                 </div>
             </section>

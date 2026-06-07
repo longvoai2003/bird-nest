@@ -9,6 +9,7 @@ import "@/components/layout.css";
 import "@/components/cards.css";
 import "@/components/cart.css";
 import { Footer } from "@/components/ui/footer";
+import { FloatingContact } from "@/components/ui/floating-contact";
 import { Header } from "@/components/ui/header";
 import { CartProvider } from "@/features/cart/context/cart-context";
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <CartProvider>
           <Header />
           <main>{children}</main>
+          <FloatingContact />
           <Footer />
         </CartProvider>
       </body>

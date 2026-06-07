@@ -55,7 +55,7 @@
 .checkoutProcessingIcon {
   align-items: center;
   background: linear-gradient(135deg, #fff7e6, #fdf0d5);
-  border: 1px solid rgba(200, 146, 42, 0.35);
+  border: 1px solid rgba(217, 144, 0, 0.38);
   border-radius: 999px;
   display: inline-flex;
   gap: 8px;
@@ -68,7 +68,7 @@
 
 .checkoutProcessingIcon::before {
   animation: checkoutRing 1.8s ease-out infinite;
-  border: 1px solid rgba(200, 146, 42, 0.42);
+  border: 1px solid rgba(217, 144, 0, 0.46);
   border-radius: inherit;
   content: "";
   inset: -8px;
@@ -340,7 +340,7 @@
 .packagingTypeOption.selected {
   background: #fff7e6;
   border-color: var(--color-primary);
-  box-shadow: 0 12px 30px rgba(155, 16, 16, 0.12);
+  box-shadow: 0 12px 30px rgba(107, 74, 0, 0.14);
 }
 
 .packagingColorSwatch {

@@ -220,15 +220,71 @@
 }
 
 .footer {
-  background: var(--color-primary-dark);
-  color: #fffef9;
-  padding: 52px 0;
+  background: linear-gradient(135deg, #ffd84d 0%, var(--color-primary) 48%, #d99000 100%);
+  color: #241a05;
+  padding: 58px 0;
 }
 
 .footerGrid {
+  align-items: start;
   display: grid;
-  gap: 28px;
-  grid-template-columns: 1.4fr 0.8fr 1.1fr 1fr;
+  gap: 48px;
+  grid-template-columns: minmax(320px, 1.15fr) minmax(360px, 0.95fr);
+}
+
+.footerBrandColumn {
+  max-width: 620px;
+}
+
+.footerLogo {
+  align-items: center;
+  display: inline-flex;
+  gap: 14px;
+  margin-bottom: 18px;
+  text-decoration: none;
+}
+
+.footerLogo img {
+  background: #fffdf2;
+  border: 1px solid rgba(107, 74, 0, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 16px 36px rgba(107, 74, 0, 0.18);
+  padding: 6px;
+}
+
+.footerLogo span {
+  display: grid;
+  gap: 4px;
+}
+
+.footerLogo strong {
+  color: #241a05;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.42rem;
+  line-height: 1.1;
+}
+
+.footerLogo small {
+  color: #5a3d00;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.footerCompanyInfo {
+  border-top: 1px solid rgba(107, 74, 0, 0.22);
+  display: grid;
+  gap: 4px;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.footerColumns {
+  display: grid;
+  gap: 34px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-self: end;
+  width: min(100%, 460px);
 }
 
 .footer h2,
@@ -237,12 +293,27 @@
   margin: 0 0 12px;
 }
 
+.footer h3 {
+  color: #241a05;
+  font-size: 1.15rem;
+}
+
 .footer p,
 .footer a {
-  color: #fdf0d5;
+  color: #3d2b00;
   display: block;
   line-height: 1.7;
   margin: 0 0 8px;
+}
+
+.footer a {
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footerColumns a:hover {
+  color: #000;
+  transform: translateX(3px);
 }
 
 @media (max-width: 960px) {
@@ -261,7 +332,12 @@
   }
 
   .footerGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .footerColumns {
+    justify-self: stretch;
+    width: 100%;
   }
 }
 
@@ -276,5 +352,14 @@
 
   .footerGrid {
     grid-template-columns: 1fr;
+  }
+
+  .footerColumns {
+    gap: 22px;
+    grid-template-columns: 1fr;
+  }
+
+  .footerLogo {
+    align-items: flex-start;
   }
 }

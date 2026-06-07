@@ -1,5 +1,5 @@
 .hero {
-  background: radial-gradient(circle at top right, rgba(200, 146, 42, 0.2), transparent 34%), linear-gradient(135deg, #fffef9 0%, #fdf0d5 100%);
+  background: radial-gradient(circle at top right, rgba(242, 183, 5, 0.28), transparent 34%), linear-gradient(135deg, #fffdf2 0%, #fff1b8 100%);
   padding: 88px 0;
 }
 
@@ -34,11 +34,13 @@
 
 .heroPanel {
   background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(200, 146, 42, 0.42);
+  border: 1px solid rgba(217, 144, 0, 0.46);
   border-radius: 32px;
   box-shadow: var(--shadow-soft);
-  min-height: 360px;
-  padding: 34px;
+  display: grid;
+  gap: 24px;
+  overflow: hidden;
+  padding: 18px;
 }
 
 .heroPanel span {
@@ -53,9 +55,29 @@
 .heroPanel h2 {
   color: var(--color-primary-dark);
   font-family: var(--font-heading), Georgia, serif;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
   line-height: 1.05;
-  margin: 82px 0 14px;
+  margin: 18px 0 12px;
+}
+
+.heroVideoFrame {
+  aspect-ratio: 16 / 9;
+  background: var(--color-primary-dark);
+  border-radius: 24px;
+  box-shadow: 0 20px 48px rgba(107, 74, 0, 0.18);
+  overflow: hidden;
+  position: relative;
+}
+
+.heroVideoFrame iframe {
+  border: 0;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.heroVideoContent {
+  padding: 0 16px 16px;
 }
 
 .commitmentSection {
