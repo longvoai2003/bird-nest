@@ -5,10 +5,13 @@ import Image from "next/image";
 import { LinkButton } from "@/components/ui/button";
 import { useCart } from "@/features/cart/context/cart-context";
 import { packagingOptions } from "@/shared/catalog/packaging";
+import { getCustomerTierInfo, getTierPrice, getTierSavings } from "@/shared/customer-tiers";
 import { formatCurrency } from "@/shared/utils/currency";
 
 export default function CartPage() {
-    const { detailedLines, subtotal, updateQuantity, removeItem } = useCart();
+    const { detailedLines, subtotal, updateQuantity, removeItem, customerTier } = useCart();
+    const tierInfo = getCustomerTierInfo(customerTier);
+    const totalSavings = detailedLines.reduce((total, line) => total + getTierSavings(line.product.price, customerTier) * line.quantity, 0);
 
     if (detailedLines.length === 0) {
         return (
@@ -32,7 +35,8 @@ export default function CartPage() {
                     <div className="cartList">
                         {detailedLines.map((line) => {
                             const selectedPackaging = packagingOptions.find((item) => item.id === line.packagingId);
-                            const unitPrice = line.product.price + (selectedPackaging?.price ?? 0);
+                            const baseUnitPrice = line.product.price + (selectedPackaging?.price ?? 0);
+                            const unitPrice = getTierPrice(line.product.price, customerTier) + (selectedPackaging?.price ?? 0);
 
                             return (
                                 <article className="card cartItem" key={`${line.productId}-${line.packagingId ?? "default"}`}>
@@ -42,7 +46,10 @@ export default function CartPage() {
                                     <div className="cartItemBody">
                                         <div className="cartItemInfo">
                                             <h2>{line.product.name}</h2>
-                                            <p className="cartItemUnitPrice">{formatCurrency(unitPrice)}</p>
+                                             <p className="cartItemUnitPrice">
+                                                {tierInfo.discountRate > 0 ? <span className="priceWas">{formatCurrency(baseUnitPrice)}</span> : null}
+                                                {formatCurrency(unitPrice)}
+                                             </p>
                                             {selectedPackaging ? (
                                                 <p className="cartItemPackaging">
                                                     Hộp quà: {selectedPackaging.family.name} - {selectedPackaging.name}
@@ -66,6 +73,9 @@ export default function CartPage() {
                 </div>
                 <aside className="card cartTotals">
                     <h2>Tổng giỏ hàng</h2>
+                    {tierInfo.discountRate > 0 ? (
+                        <div><span>Ưu đãi {tierInfo.label}</span><strong>-{formatCurrency(totalSavings)}</strong></div>
+                    ) : null}
                     <div><span>Tạm tính</span><strong>{formatCurrency(subtotal)}</strong></div>
                     <p>Hộp quà được chọn trực tiếp tại trang chi tiết sản phẩm.</p>
                     <LinkButton href="/checkout">Tiến hành đặt hàng</LinkButton>

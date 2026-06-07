@@ -20,9 +20,9 @@ type AuthCustomer = {
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { detailedLines, subtotal, clearCart } = useCart();
+    const { detailedLines, subtotal, clearCart, customerTier } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
+    const [isRedirectingToSuccess, setIsRedirectingToSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [customer, setCustomer] = useState({ fullName: "", phone: "", email: "" });
 
@@ -56,6 +56,22 @@ export default function CheckoutPage() {
 
     async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        if (isSubmitting) {
+            return;
+        }
+
+        const orderItems = detailedLines.map((line) => ({
+            productId: line.productId,
+            quantity: line.quantity,
+            packagingId: line.packagingId,
+        }));
+
+        if (orderItems.length === 0) {
+            setError("Giỏ hàng của bạn đang trống.");
+            return;
+        }
+
         setIsSubmitting(true);
         setError(null);
 
@@ -72,32 +88,31 @@ export default function CheckoutPage() {
                         email: String(formData.get("email") ?? ""),
                         deliveryAddress: String(formData.get("deliveryAddress") ?? ""),
                     },
-                    items: detailedLines.map((line) => ({
-                        productId: line.productId,
-                        quantity: line.quantity,
-                        packagingId: line.packagingId,
-                    })),
+                    items: orderItems,
                     notes: String(formData.get("notes") ?? ""),
                 }),
             });
 
-            const data = (await response.json()) as (ApiError & { orderId?: string });
+            const data = await response
+                .json()
+                .catch(() => ({ error: "Unable to submit order request" })) as ApiError & { orderId?: string };
 
             if (!response.ok || !data.orderId) {
                 const issueText = data.issues?.map((issue) => issue.message).join(" ");
                 throw new Error(issueText || data.error || "Unable to submit order request");
             }
 
-            setCompletedOrderId(data.orderId);
+            setIsRedirectingToSuccess(true);
             clearCart();
             router.replace(`/order-success?orderId=${encodeURIComponent(data.orderId)}`);
         } catch (submitError) {
             setError(submitError instanceof Error ? submitError.message : "Unable to submit order request");
             setIsSubmitting(false);
+            setIsRedirectingToSuccess(false);
         }
     }
 
-    if (detailedLines.length === 0 && !isSubmitting && !completedOrderId) {
+    if (detailedLines.length === 0 && !isSubmitting && !isRedirectingToSuccess) {
         return (
             <section className="section">
                 <div className="container emptyCart card">
@@ -112,7 +127,7 @@ export default function CheckoutPage() {
 
     return (
         <section className="section checkoutSection">
-            {isSubmitting || completedOrderId ? (
+            {isSubmitting || isRedirectingToSuccess ? (
                 <div className="checkoutProcessingOverlay" role="status" aria-live="polite" aria-label="Đang xử lý đơn hàng">
                     <div className="checkoutProcessingCard card">
                         <div className="checkoutProcessingIcon" aria-hidden="true">
@@ -121,8 +136,8 @@ export default function CheckoutPage() {
                             <span />
                         </div>
                         <p className="eyebrow">Đang xử lý</p>
-                        <h2>{completedOrderId ? "Đơn hàng đã được tạo" : "Đang lưu đơn hàng của bạn"}</h2>
-                        <p>{completedOrderId ? "Đang chuyển bạn đến trang xác nhận đơn hàng." : "Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng."}</p>
+                        <h2>{isRedirectingToSuccess ? "Đơn hàng đã được tạo" : "Đang lưu đơn hàng của bạn"}</h2>
+                        <p>{isRedirectingToSuccess ? "Đang chuyển bạn đến trang xác nhận đơn hàng." : "Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng."}</p>
                     </div>
                 </div>
             ) : null}
@@ -141,7 +156,7 @@ export default function CheckoutPage() {
                     {error ? <p className="errorText">{error}</p> : null}
                     <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Đang xử lý đơn hàng..." : "Gửi yêu cầu đặt hàng"}</Button>
                 </form>
-                <OrderSummary lines={detailedLines} subtotal={subtotal} />
+                <OrderSummary lines={detailedLines} subtotal={subtotal} customerTier={customerTier} />
             </div>
         </section>
     );

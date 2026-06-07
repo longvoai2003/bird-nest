@@ -7,6 +7,7 @@ import { useCart } from "@/features/cart/context/cart-context";
 import { PackagingSelector } from "@/features/checkout/components/packaging-selector";
 import { packagingOptions } from "@/shared/catalog/packaging";
 import { type Product } from "@/shared/catalog/products";
+import { getCustomerTierInfo, getTierPrice } from "@/shared/customer-tiers";
 import { formatCurrency } from "@/shared/utils/currency";
 
 const defaultPackagingId = "suitcase-green-lotus";
@@ -16,14 +17,16 @@ type ProductDetailProps = {
 };
 
 export function ProductDetail({ product }: ProductDetailProps) {
-    const { addItem } = useCart();
+    const { addItem, customerTier } = useCart();
     const [quantity, setQuantity] = useState(1);
     const [selectedPackagingId, setSelectedPackagingId] = useState(product.supportsPackaging ? defaultPackagingId : "");
     const [added, setAdded] = useState(false);
 
     const selectedPackaging = packagingOptions.find((item) => item.id === selectedPackagingId);
+    const tierInfo = getCustomerTierInfo(customerTier);
+    const discountedProductPrice = getTierPrice(product.price, customerTier);
     const displayImage = selectedPackaging?.image ?? product.image;
-    const displayPrice = product.price + (selectedPackaging?.price ?? 0);
+    const displayPrice = discountedProductPrice + (selectedPackaging?.price ?? 0);
 
     function submitAddToCart() {
         for (let index = 0; index < quantity; index += 1) {
@@ -62,12 +65,24 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     <div className="productDetailFacts card">
                         <div><span>Đơn vị</span><strong>{product.unit}</strong></div>
                         <div><span>Tình trạng</span><strong>{product.availability === "preorder" ? "Đặt trước" : "Còn hàng"}</strong></div>
-                        <div><span>Giá hiện tại</span><strong>{formatCurrency(displayPrice)}</strong></div>
+                        <div>
+                            <span>Giá hiện tại</span>
+                            <strong>
+                                {tierInfo.discountRate > 0 ? <span className="priceWas">{formatCurrency(product.price + (selectedPackaging?.price ?? 0))}</span> : null}
+                                {formatCurrency(displayPrice)}
+                            </strong>
+                        </div>
                     </div>
+
+                    {tierInfo.discountRate > 0 ? (
+                        <p className="tierDiscountText">
+                            {tierInfo.label} đang giảm {Math.round(tierInfo.discountRate * 100)}% trên giá sản phẩm.
+                        </p>
+                    ) : null}
 
                     {selectedPackaging ? (
                         <div className="productPriceBreakdown card">
-                            <div><span>Giá sản phẩm</span><strong>{formatCurrency(product.price)}</strong></div>
+                            <div><span>Giá sản phẩm</span><strong>{formatCurrency(discountedProductPrice)}</strong></div>
                             <div><span>Phí hộp quà</span><strong>+{formatCurrency(selectedPackaging.price)}</strong></div>
                         </div>
                     ) : product.supportsPackaging ? (
