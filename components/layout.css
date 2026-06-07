@@ -13,11 +13,16 @@
   gap: 24px;
   justify-content: space-between;
   min-height: 78px;
+  max-width: none;
+  padding-left: clamp(16px, 3vw, 42px);
+  padding-right: clamp(16px, 3vw, 42px);
+  width: 100%;
 }
 
 .logo {
   align-items: center;
   display: flex;
+  flex: 0 0 auto;
   gap: 12px;
 }
 
@@ -51,13 +56,16 @@
 .desktopNav {
   align-items: center;
   display: flex;
-  gap: 20px;
+  flex: 1 1 auto;
+  gap: clamp(24px, 3vw, 42px);
+  justify-content: center;
 }
 
 .desktopNav a {
   color: var(--color-muted);
-  font-size: 0.94rem;
-  font-weight: 800;
+  font-size: clamp(1rem, 1.1vw, 1.18rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
 }
 
 .desktopNav a:hover,
@@ -68,12 +76,9 @@
 .headerActions {
   align-items: center;
   display: flex;
+  flex: 0 0 auto;
   gap: 12px;
-}
-
-.hotline {
-  color: var(--color-primary);
-  font-weight: 900;
+  justify-content: flex-end;
 }
 
 .cartPill {
@@ -110,13 +115,68 @@
 }
 
 .customerGreeting {
-  color: var(--color-muted);
+  color: var(--color-primary-dark);
   font-size: 0.9rem;
   font-weight: 800;
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.customerGreeting:hover {
+  color: var(--color-primary);
+}
+
+.signOutIconButton {
+  align-items: center;
+  background: #fffaf1;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+  padding: 0;
+  width: 34px;
+}
+
+.signOutIconButton svg {
+  fill: none;
+  height: 18px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 18px;
+}
+
+.tierHeaderBadge {
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 8px 10px;
+}
+
+.tierHeaderBadge-standard {
+  background: #79543a;
+}
+
+.tierHeaderBadge-silver {
+  background: linear-gradient(135deg, #69737f, #b9c2cd);
+}
+
+.tierHeaderBadge-gold {
+  background: linear-gradient(135deg, #9d650b, #d6a726);
+}
+
+.tierHeaderBadge-premium {
+  background: linear-gradient(135deg, #191726, #7d4dff 62%, #c8932a);
 }
 
 .menuButton {
@@ -187,7 +247,11 @@
 
 @media (max-width: 960px) {
   .desktopNav,
-  .hotline {
+  .tierHeaderBadge,
+  .customerGreeting,
+  .authLink,
+  .authButton,
+  .signOutIconButton {
     display: none;
   }
 

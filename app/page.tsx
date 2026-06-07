@@ -2,7 +2,7 @@ import Image from "next/image";
 import { news } from "@/server/content/news";
 import { LinkButton } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { ProductCard } from "@/features/catalog/components/product-card";
+import { FeaturedProducts } from "@/features/catalog/components/featured-products";
 import { NewsCard } from "@/features/news/components/news-card";
 import { products } from "@/shared/catalog/products";
 import { company } from "@/shared/config/company";
@@ -68,9 +68,7 @@ export default function HomePage() {
             <section className="section">
                 <div className="container">
                     <SectionHeading eyebrow="Sản phẩm nổi bật" title="Yến sào cho sức khỏe và quà tặng" description="Các sản phẩm demo được thiết kế để thể hiện hành trình mua hàng đơn giản hơn website hiện tại." />
-                    <div className="grid3">
-                        {products.slice(0, 3).map((product) => <ProductCard key={product.id} product={product} />)}
-                    </div>
+                    <FeaturedProducts products={products.slice(0, 3)} />
                 </div>
             </section>
 

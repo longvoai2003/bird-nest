@@ -187,6 +187,49 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.tierInlineSelector {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 18px;
+}
+
+.tierInlineSelector strong {
+  color: var(--color-primary-dark);
+  display: block;
+}
+
+.tierInlineSelector span {
+  color: var(--color-muted);
+  display: block;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.tierInlineButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tierInlineButtons button {
+  background: #fffaf1;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  font-weight: 900;
+  padding: 9px 12px;
+}
+
+.tierInlineButtons button.active {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: #fff;
+}
+
 .productDetailPage {
   background: linear-gradient(180deg, rgba(253, 240, 213, 0.45), rgba(255, 254, 249, 0) 420px);
 }
@@ -246,6 +289,26 @@
   gap: 12px;
 }
 
+.tierPriceBlock {
+  display: grid;
+  gap: 4px;
+}
+
+.tierPriceBlock span,
+.priceWas {
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: line-through;
+}
+
+.tierPriceBlock small,
+.tierDiscountText {
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
 .productDetailFacts div {
   align-items: center;
   border-bottom: 1px solid var(--color-border);
@@ -278,6 +341,12 @@
 .productPriceBreakdown strong,
 .productPackagingHeader h2 {
   color: var(--color-primary-dark);
+}
+
+.productDetailFacts strong {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
 }
 
 .productPackagingNote {
@@ -341,9 +410,169 @@
   font-size: 0.92rem;
 }
 
+.accountPage {
+  background: linear-gradient(180deg, rgba(253, 240, 213, 0.5), rgba(255, 254, 249, 0) 380px);
+}
+
+.accountLayout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+}
+
+.accountIntro p:not(.eyebrow) {
+  color: var(--color-muted);
+  line-height: 1.75;
+  max-width: 720px;
+}
+
+.membershipCard {
+  border-radius: 32px;
+  box-shadow: 0 24px 70px rgba(58, 34, 19, 0.2);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 260px;
+  overflow: hidden;
+  padding: 28px;
+  position: relative;
+}
+
+.membershipCard::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.36), transparent 62%);
+  content: "";
+  height: 260px;
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 260px;
+}
+
+.membershipCard-standard {
+  background: linear-gradient(135deg, #79543a, #c8932a);
+}
+
+.membershipCard-silver {
+  background: linear-gradient(135deg, #67717c, #cbd5df);
+}
+
+.membershipCard-gold {
+  background: linear-gradient(135deg, #8b5a08, #e0b53f);
+}
+
+.membershipCard-premium {
+  background: linear-gradient(135deg, #191726, #7d4dff 58%, #c8932a);
+}
+
+.membershipSymbol {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  padding: 9px 12px;
+}
+
+.membershipCard p {
+  font-weight: 800;
+  margin: 22px 0 0;
+  opacity: 0.82;
+}
+
+.membershipCard h2 {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(2.6rem, 6vw, 4.8rem);
+  line-height: 1;
+  margin: 8px 0 0;
+}
+
+.membershipDiscount {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.membershipDiscount span {
+  font-size: 0.9rem;
+  font-weight: 800;
+  opacity: 0.82;
+}
+
+.membershipDiscount strong {
+  font-size: 2.4rem;
+}
+
+.tierSelectorCard,
+.tierBenefitCard {
+  padding: 26px;
+}
+
+.tierSelectorCard h2,
+.tierBenefitCard h2 {
+  color: var(--color-primary-dark);
+  margin-top: 0;
+}
+
+.tierGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tierOption {
+  background: #fffaf1;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  text-align: left;
+}
+
+.tierOption.active {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: #fff;
+}
+
+.tierOption span {
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.tierOption.active span {
+  color: var(--color-accent-light);
+}
+
+.tierOption small,
+.tierBenefitCard p {
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.tierOption.active small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.tierNote {
+  background: rgba(200, 146, 42, 0.12);
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
 @media (max-width: 820px) {
   .contactGrid,
-  .productsHeroGrid {
+  .productsHeroGrid,
+  .accountLayout {
     grid-template-columns: 1fr;
   }
 
@@ -352,6 +581,11 @@
   }
 
   .catalogToolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tierInlineSelector {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -372,5 +606,9 @@
   .quantityPicker {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .tierGrid {
+    grid-template-columns: 1fr;
   }
 }

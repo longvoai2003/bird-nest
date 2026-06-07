@@ -1,5 +1,5 @@
 import { SectionHeading } from "@/components/ui/section-heading";
-import { ProductCard } from "@/features/catalog/components/product-card";
+import { ProductCatalog } from "@/features/catalog/components/product-catalog";
 import { products } from "@/shared/catalog/products";
 
 export default function ProductsPage() {
@@ -37,9 +37,7 @@ export default function ProductsPage() {
             </label>
           </div>
 
-          <div className="productGrid">
-            {products.map((product) => <ProductCard key={product.id} product={product} />)}
-          </div>
+          <ProductCatalog products={products} />
         </div>
       </div>
     </section>

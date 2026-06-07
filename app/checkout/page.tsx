@@ -20,7 +20,7 @@ type AuthCustomer = {
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { detailedLines, subtotal, clearCart } = useCart();
+    const { detailedLines, subtotal, clearCart, customerTier } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [customer, setCustomer] = useState({ fullName: "", phone: "", email: "" });
@@ -139,7 +139,7 @@ export default function CheckoutPage() {
                     {error ? <p className="errorText">{error}</p> : null}
                     <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Đang xử lý đơn hàng..." : "Gửi yêu cầu đặt hàng"}</Button>
                 </form>
-                <OrderSummary lines={detailedLines} subtotal={subtotal} />
+                <OrderSummary lines={detailedLines} subtotal={subtotal} customerTier={customerTier} />
             </div>
         </section>
     );

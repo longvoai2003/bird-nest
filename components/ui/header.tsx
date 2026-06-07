@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCart } from "@/features/cart/context/cart-context";
 import { company } from "@/shared/config/company";
+import { getCustomerTierInfo } from "@/shared/customer-tiers";
 
 type AuthCustomer = {
     id: string;
@@ -25,9 +26,10 @@ const links = [
 export function Header() {
     const router = useRouter();
     const pathname = usePathname();
-    const { itemCount } = useCart();
+    const { itemCount, customerTier } = useCart();
     const [open, setOpen] = useState(false);
     const [customer, setCustomer] = useState<AuthCustomer | null>(null);
+    const tierInfo = getCustomerTierInfo(customerTier);
 
     useEffect(() => {
         let ignore = false;
@@ -88,17 +90,23 @@ export function Header() {
                     ))}
                 </nav>
                 <div className="headerActions">
-                    <a className="hotline" href={`tel:${company.phone.replaceAll(".", "")}`}>
-                        {company.phone}
-                    </a>
                     <Link className="cartPill" href="/cart">
                         Giỏ hàng <span>{itemCount}</span>
                     </Link>
+                    <Link className={`tierHeaderBadge tierHeaderBadge-${tierInfo.id}`} href="/account" title="Chọn hạng thành viên">
+                        {tierInfo.symbol}
+                    </Link>
                     {customer ? (
                         <>
-                            <span className="customerGreeting">{customer.fullName}</span>
-                            <button className="authLink authButton" onClick={signOut} type="button">
-                                Đăng xuất
+                            <Link className="customerGreeting" href="/account">
+                                {customer.fullName}
+                            </Link>
+                            <button className="signOutIconButton" onClick={signOut} type="button" aria-label="Đăng xuất" title="Đăng xuất">
+                                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                                    <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+                                    <path d="M14 16l4-4-4-4" />
+                                    <path d="M18 12H9" />
+                                </svg>
                             </button>
                         </>
                     ) : (
@@ -127,15 +135,22 @@ export function Header() {
                     </Link>
                     {customer ? (
                         <>
-                            <span className="mobileCustomer">{customer.fullName}</span>
+                            <Link href="/account" onClick={() => setOpen(false)}>
+                                {tierInfo.symbol} {customer.fullName}
+                            </Link>
                             <button className="mobileSignOut" onClick={signOut} type="button">
                                 Đăng xuất
                             </button>
                         </>
                     ) : (
-                        <Link href="/sign-in" onClick={() => setOpen(false)}>
-                            Đăng nhập
-                        </Link>
+                        <>
+                            <Link href="/account" onClick={() => setOpen(false)}>
+                                Tài khoản
+                            </Link>
+                            <Link href="/sign-in" onClick={() => setOpen(false)}>
+                                Đăng nhập
+                            </Link>
+                        </>
                     )}
                 </nav>
             ) : null}
