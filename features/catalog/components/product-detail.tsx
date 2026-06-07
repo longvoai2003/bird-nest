@@ -11,6 +11,7 @@ import { getCustomerTierInfo, getTierPrice } from "@/shared/customer-tiers";
 import { formatCurrency } from "@/shared/utils/currency";
 
 const defaultPackagingId = "suitcase-green-lotus";
+const customDesignProductId = "to-yen-chung-nguyen-chat";
 
 type ProductDetailProps = {
     product: Product;
@@ -27,6 +28,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
     const discountedProductPrice = getTierPrice(product.price, customerTier);
     const displayImage = selectedPackaging?.image ?? product.image;
     const displayPrice = discountedProductPrice + (selectedPackaging?.price ?? 0);
+    const supportsCustomDesignRequest = product.id === customDesignProductId;
 
     function submitAddToCart() {
         for (let index = 0; index < quantity; index += 1) {
@@ -60,6 +62,26 @@ export function ProductDetail({ product }: ProductDetailProps) {
                             </button>
                         </div>
                     ) : null}
+
+
+                    {supportsCustomDesignRequest ? (
+                        <div className="productCustomDesignCard card">
+                            <div className="productCustomDesignIcon" aria-hidden="true" />
+                            <div className="productCustomDesignContent">
+                                <span className="productCustomDesignLabel">Thiết kế riêng</span>
+                                <h2>Chưa tìm thấy mẫu hộp ưng ý?</h2>
+                                <p>Gửi ý tưởng về màu sắc, lời chúc, dịp tặng hoặc số lượng. Cửa hàng sẽ tư vấn phương án đóng gói riêng để món quà trông đúng gu hơn.</p>
+                                <div className="productCustomDesignTags" aria-label="Các nội dung có thể tùy chỉnh">
+                                    <span>Màu sắc</span>
+                                    <span>Lời chúc</span>
+                                    <span>Concept quà tặng</span>
+                                </div>
+                            </div>
+                            <LinkButton className="productCustomDesignButton" href="/contact?topic=custom-design&product=to-yen-chung-nguyen-chat">
+                                Nhận tư vấn thiết kế riêng
+                            </LinkButton>
+                        </div>
+                    ) : null}
                     <span className="productDetailBadge">{product.badge}</span>
                     <p className="productDetailDescription">{product.description}</p>
                     <div className="productDetailFacts card">
@@ -90,6 +112,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                             Có thể chọn hộp quà ở bên trên, phí hộp quà sẽ được cộng vào giá sản phẩm.
                         </p>
                     ) : null}
+
 
                     <div className="productPurchaseCard card">
                         <div className="quantityPicker">

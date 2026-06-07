@@ -7,6 +7,7 @@ describe("POST /api/contact", () => {
     phone: "bad",
     email: "bad",
     message: "short",
+    appointmentDate: "10/06/2026",
   };
 
   test("returns 400 for invalid JSON body", async () => {
