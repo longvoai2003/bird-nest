@@ -4,6 +4,31 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+type AuthApiError = {
+    error?: string;
+    detail?: string;
+    requestId?: string;
+    issues?: Array<{ path: string; message: string }>;
+};
+
+function formatAuthError(body: AuthApiError | null) {
+    const messages = body?.issues?.map((issue) => issue.message).filter(Boolean) ?? [];
+
+    if (body?.error) {
+        messages.unshift(body.error);
+    }
+
+    if (body?.detail) {
+        messages.push(body.detail);
+    }
+
+    if (body?.requestId) {
+        messages.push(`Mã lỗi: ${body.requestId}`);
+    }
+
+    return messages.join(" ") || "Không thể đăng ký. Vui lòng thử lại hoặc liên hệ hỗ trợ.";
+}
+
 export default function RegisterPage() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
@@ -17,8 +42,8 @@ export default function RegisterPage() {
         });
 
         if (!response.ok) {
-            const body = await response.json().catch(() => null);
-            setError(body?.error ?? "Không thể đăng ký");
+            const body = (await response.json().catch(() => null)) as AuthApiError | null;
+            setError(formatAuthError(body));
             return;
         }
 

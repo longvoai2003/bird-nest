@@ -122,8 +122,8 @@ export default function CheckoutPage() {
                             <span />
                         </div>
                         <p className="eyebrow">Đang xử lý</p>
-                        <h2>Đang lưu đơn hàng của bạn</h2>
-                        <p>Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng.</p>
+                        <h2>{completedOrderId ? "Đơn hàng đã được tạo" : "Đang lưu đơn hàng của bạn"}</h2>
+                        <p>{completedOrderId ? "Đang chuyển bạn đến trang xác nhận đơn hàng." : "Vui lòng chờ trong giây lát. Hệ thống đang kiểm tra giỏ hàng và tạo mã đơn hàng."}</p>
                     </div>
                 </div>
             ) : null}
